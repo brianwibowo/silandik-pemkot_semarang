@@ -27,12 +27,11 @@
                 </a>
                 <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="sekolah_inklusi.php">Data Sekolah Inklusi</a>
-                        <a class="nav-link" href="data_siswa.php">Data Siswa</a>
+                        <a class="nav-link" href="kategori_data/data_sekolah_inklusi.php">Data Sekolah Inklusi</a>
+                        <a class="nav-link" href="kategori_data/data_siswa.php">Data Siswa</a>
+
                     </nav>
                 </div>
-
-
                 <div class="sb-sidenav-menu-heading">Addons</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseInformasi" aria-expanded="false" aria-controls="collapseInformasi">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
