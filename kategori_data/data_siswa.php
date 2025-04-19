@@ -1,4 +1,4 @@
-<?php include 'partials/head.php'; ?>
+<?php include '../partials/head.php'; ?>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php"><img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK</a>
@@ -27,7 +27,7 @@
 
     <div id="layoutSidenav">
         <!-- Include Sidebar -->
-        <?php include 'sidebar.php'; ?>
+        <?php include '../sidebar.php'; ?>
 
         <div id="layoutSidenav_content">
             <main>
@@ -83,6 +83,6 @@
             </main>
         </div>
     </div>
-    <?php include 'partials/footer.php'; ?>
+    <?php include '../partials/footer.php'; ?>
 </body>
 </html>
