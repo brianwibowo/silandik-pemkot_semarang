@@ -46,7 +46,7 @@
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Beranda</h1>
+                    <h1 class="mt-4">Dasar Hukum</h1>
 
                     <!-- Dasar Hukum Section -->
                     <div class="card mb-4">
@@ -61,52 +61,6 @@
                         </div>
                     </div>
 
-
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-table me-1"></i>
-                            DataTable Example
-                        </div>
-                        <div class="card-body">
-                            <table id="datatablesSimple">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Nama</th>
-                                        <th>Asal Sekolah</th>
-                                        <th>Kelas</th>
-                                        <th>Alamat</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Nama</th>
-                                        <th>Asal Sekolah</th>
-                                        <th>Kelas</th>
-                                        <th>Alamat</th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
-                                    <tr>
-                                        <td>Tiger Nixon</td>
-                                        <td>System Architect</td>
-                                        <td>Edinburgh</td>
-                                        <td>61</td>
-                                        <td>2011/04/25</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jilan</td>
-                                        <td>System Architect</td>
-                                        <td>Edinburgh</td>
-                                        <td>61</td>
-                                        <td>2011/04/25</td>
-                                    </tr>
-                                    <!-- Tambahan baris lainnya -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
             </main>
         </div>
