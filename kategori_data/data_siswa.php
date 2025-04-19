@@ -32,7 +32,7 @@
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Beranda</h1>
+                    <h1 class="mt-4">Data Siswa</h1>
 
                     <div class="card mb-4">
                         <div class="card-header">
