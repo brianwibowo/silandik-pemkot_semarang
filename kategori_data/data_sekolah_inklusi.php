@@ -90,8 +90,8 @@ include '../koneksi.php';
                                                 <a href="edit_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" onclick="return confirm('Yakin ingin mengubah data ini?')">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                                    <i class="fas fa-edit"></i>
+                                                <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                    <i class="fas fa-trash"></i>
                                                 </a>
                                             </td>
 
