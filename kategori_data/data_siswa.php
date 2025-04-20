@@ -1,8 +1,9 @@
 <?php include '../partials/head.php'; ?>
 <?php include '../koneksi.php'; ?>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="index.php">
+        <a class="navbar-brand ps-3" href="/silandik-semarang/index.php">
             <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
@@ -16,7 +17,9 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/silandik-semarang/authentification/login.php">Login</a></li>
                     <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
                     <li><a class="dropdown-item" href="#">Logout</a></li>
                 </ul>
             </li>
@@ -33,7 +36,7 @@
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-table me-1"></i> Data Siswa</span>
-                            <a href="tambah_siswa.php" class="btn btn-success btn-sm">
+                            <a href="/silandik-semarang/kategori_data/tambah_siswa.php" class="btn btn-success btn-sm">
                                 <i class="fas fa-plus"></i> Tambah Data Siswa
                             </a>
                         </div>
@@ -75,7 +78,7 @@
                                                 <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" onclick="return confirm('Yakin ingin mengubah data ini?')">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="delete_siswa.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                <a href="hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </td>
@@ -91,4 +94,5 @@
     </div>
     <?php include '../partials/footer.php'; ?>
 </body>
+
 </html>

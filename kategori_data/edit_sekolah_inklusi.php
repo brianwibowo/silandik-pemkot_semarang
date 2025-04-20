@@ -1,9 +1,11 @@
 <?php
 include '../koneksi.php';
 include '../partials/head.php';
+?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<?php
 $id = $_GET['id'];
-
 $query = mysqli_query($conn, "SELECT * FROM data_sekolah_inklusi WHERE no = '$id'");
 $data = mysqli_fetch_assoc($query);
 
@@ -41,7 +43,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         WHERE no='$id'");
 
     if ($update) {
-        header("Location: data_sekolah_inklusi.php");
+        echo "
+        <script>
+            Swal.fire({
+                title: 'Sukses!',
+                text: 'Data berhasil diupdate',
+                icon: 'success',
+                confirmButtonColor: '#198754',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = '/silandik-semarang/kategori_data/data_sekolah_inklusi.php';
+            });
+        </script>";
         exit();
     } else {
         echo "Gagal mengupdate data.";
@@ -49,47 +62,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<body class="bg-primary">
-    <div id="layoutAuthentication">
-        <div id="layoutAuthentication_content">
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <a class="navbar-brand ps-3" href="/silandik-semarang/index.php">
+            <img src="/silandik-semarang/logo_dinas.png" width="50" height="40" alt="Logo"> SILANDIK
+        </a>
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="navbar-nav ms-auto me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user fa-fw"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="/silandik-semarang/authentification/login.php">Login</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div id="layoutSidenav">
+        <?php include '../sidebar.php'; ?>
+        <div id="layoutSidenav_content">
             <main>
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-5">
-                            <div class="container mt-5">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4>Edit Data Sekolah Inklusi</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <form method="POST" enctype="multipart/form-data">
-                                            <div class="mb-3">
-                                                <label for="nama_sekolah" class="form-label">Nama Sekolah</label>
-                                                <input type="text" name="nama_sekolah" class="form-control" id="nama_sekolah" value="<?= htmlspecialchars($data['nama_sekolah']); ?>" required>
-                                            </div>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Edit Data Sekolah Inklusi</h1>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-school me-1"></i>
+                            Form Edit Sekolah Inklusi
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="nama_sekolah" class="form-label">Nama Sekolah</label>
+                                    <input type="text" name="nama_sekolah" class="form-control" id="nama_sekolah" value="<?= htmlspecialchars($data['nama_sekolah']); ?>" required>
+                                </div>
 
-                                            <div class="mb-3">
-                                                <label for="logo" class="form-label">Logo Sekolah</label>
-                                                <input type="file" name="logo" class="form-control" id="logo" accept="image/*" onchange="previewImage(event)">
-                                                <input type="hidden" name="logo_lama" value="<?= htmlspecialchars($data['logo_sekolah']); ?>">
-                                                
-                                                <div id="logoPreviewContainer" class="mt-3" style="<?= $data['logo_sekolah'] ? '' : 'display: none;' ?>">
-                                                    <h5>Preview Logo:</h5>
-                                                    <img id="logoPreview" src="../upload/<?= $data['logo_sekolah']; ?>" alt="Logo Preview" style="width: 150px; height: auto; border-radius: 5px;">
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="deskripsi" class="form-label">Deskripsi</label>
-                                                <textarea name="deskripsi" class="form-control" id="deskripsi" rows="4" required><?= htmlspecialchars($data['deskripsi']); ?></textarea>
-                                            </div>
-
-                                            <button type="submit" class="btn btn-success">Update</button>
-                                            <a href="data_sekolah_inklusi.php" class="btn btn-secondary">Kembali</a>
-                                        </form>
+                                <div class="mb-3">
+                                    <label for="logo" class="form-label">Logo Sekolah</label>
+                                    <input type="file" name="logo" class="form-control" id="logo" accept="image/*" onchange="previewImage(event)">
+                                    <input type="hidden" name="logo_lama" value="<?= htmlspecialchars($data['logo_sekolah']); ?>">
+                                    
+                                    <div id="logoPreviewContainer" class="mt-3" style="<?= $data['logo_sekolah'] ? '' : 'display: none;' ?>">
+                                        <h6>Preview Logo:</h6>
+                                        <img id="logoPreview" src="../upload/<?= $data['logo_sekolah']; ?>" alt="Logo Preview" style="width: 150px; height: auto; border-radius: 5px;">
                                     </div>
                                 </div>
-                            </div>
+
+                                <div class="mb-3">
+                                    <label for="deskripsi" class="form-label">Deskripsi</label>
+                                    <textarea name="deskripsi" class="form-control" id="deskripsi" rows="4" required><?= htmlspecialchars($data['deskripsi']); ?></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
+                                <a href="/silandik-semarang/kategori_data/data_sekolah_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -109,5 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             reader.readAsDataURL(event.target.files[0]);
         }
     </script>
+
+    <?php include '../partials/footer.php'; ?>
 </body>
 </html>
