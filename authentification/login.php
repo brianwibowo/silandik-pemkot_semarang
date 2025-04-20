@@ -7,10 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Login - SB Admin</title>
+    <title>Login - Silandik</title>
     <link href="/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-
 </head>
 
 <body class="bg-primary">
@@ -21,12 +20,12 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-5">
                             <div class="card shadow-lg border-0 rounded-lg mt-5">
-                                <div class="card-header">
-                                    <h3 class="text-center font-weight-light my-4">Login</h3>
+                                <div class="card-header bg-primary text-white">
+                                    <h3 class="text-center font-weight-light my-2">Login</h3>
                                 </div>
                                 <div class="card-body">
                                     <?php if(isset($error)): ?>
-                                        <div class="error-message"><?php echo $error; ?></div>
+                                        <div class="alert alert-danger text-center"><?php echo $error; ?></div>
                                     <?php endif; ?>
                                     <form method="POST" action="login.php">
                                         <div class="form-floating mb-3">
@@ -39,22 +38,17 @@
                                         </div>
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" id="inputRememberPassword" type="checkbox" />
-                                            <label class="form-check-label" for="inputRememberPassword">Remember Password</label>
+                                            <label class="form-check-label" for="inputRememberPassword">Show Password</label>
                                         </div>
                                         <script>
-                                            document.getElementById('inputRememberPassword').addEventListener('change', function() {
-                                                let passwordInput = document.getElementById('inputPassword');
-                                                if (this.checked) {
-                                                    passwordInput.type = 'text';
-                                                } else {
-                                                    passwordInput.type = 'password';
-                                                }
+                                            document.getElementById('inputRememberPassword').addEventListener('change', function () {
+                                                const passwordInput = document.getElementById('inputPassword');
+                                                passwordInput.type = this.checked ? 'text' : 'password';
                                             });
                                         </script>
-
                                         <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
                                             <a class="small" href="password.php">Forgot Password?</a>
-                                            <button type="submit" class="btn btn-primary">Login</button>
+                                            <button class="btn btn-primary" type="submit">Login</button>
                                         </div>
                                     </form>
                                 </div>
@@ -67,8 +61,23 @@
                 </div>
             </main>
         </div>
+        <div id="layoutAuthentication_footer">
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">© 2025 Silandik Semarang</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms & Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="/js/scripts.js"></script>
 </body>
+
 </html>
