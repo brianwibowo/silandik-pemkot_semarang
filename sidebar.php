@@ -4,7 +4,7 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Main Pages</div>
-                <a class="nav-link" href="/silandik-semarang/index.php">
+                <a class="nav-link" href="/index.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Beranda
                 </a>
@@ -16,7 +16,7 @@
                 </a>
                 <div class="collapse" id="collapseRegulasi" aria-labelledby="headingRegulasi" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="/silandik-semarang/regulasi/dasar_hukum.php">Dasar Hukum</a>
+                        <a class="nav-link" href="/regulasi/dasar_hukum.php">Dasar Hukum</a>
                     </nav>
                 </div>
                 <!-- Sekolah Inklusi -->
@@ -27,8 +27,8 @@
                 </a>
                 <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="/silandik-semarang/kategori_data/data_sekolah_inklusi.php">Data Sekolah Inklusi</a>
-                        <a class="nav-link" href="/silandik-semarang/kategori_data/data_siswa.php">Data Siswa</a>
+                        <a class="nav-link" href="/kategori_data/data_sekolah_inklusi.php">Data Sekolah Inklusi</a>
+                        <a class="nav-link" href="/kategori_data/data_siswa.php">Data Siswa</a>
                     </nav>
                 </div>
                 <div class="sb-sidenav-menu-heading">Addons</div>

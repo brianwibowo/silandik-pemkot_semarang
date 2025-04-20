@@ -5,7 +5,7 @@ include '../koneksi.php';
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="index.php">
+        <a class="navbar-brand ps-3" href="/index.php">
             <img src="/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
@@ -87,17 +87,21 @@ include '../koneksi.php';
                                             <td><?= htmlspecialchars($row['nama_sekolah']); ?></td>
                                             <td><?= htmlspecialchars($row['deskripsi']); ?></td>
                                             <td>
-                                                <a href="edit_sekolah_inklusi.php?id=<?= htmlspecialchars($row['id']); ?>" 
-                                                    class="btn btn-warning btn-sm" 
-                                                    onclick="return confirm('Yakin ingin mengubah data ini?')">
-                                                    <i class="fas fa-edit"></i>
+                                                <!-- Tombol Edit -->
+                                                <a href="edit_sekolah_inklusi.php?id=<?= htmlspecialchars($row['no']); ?>" 
+                                                   class="btn btn-warning btn-sm" 
+                                                   onclick="return confirm('Yakin ingin mengubah data ini?')">
+                                                   <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="delete_sekolah_inklusi.php?id=<?= htmlspecialchars($row['id']); ?>" 
-                                                    class="btn btn-danger btn-sm" 
-                                                    onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                                    <i class="fas fa-trash"></i>
+
+                                                <!-- Tombol Hapus -->
+                                                <a href="hapus_sekolah_inklusi.php?id=<?= htmlspecialchars($row['no']); ?>" 
+                                                   class="btn btn-danger btn-sm" 
+                                                   onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                   <i class="fas fa-trash"></i>
                                                 </a>
                                             </td>
+
                                         </tr>
                                     <?php } ?>
                                 </tbody>
