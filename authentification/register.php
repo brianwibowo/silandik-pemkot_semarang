@@ -8,33 +8,9 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>Register - SB Admin</title>
-    <link href="css/styles.css" rel="stylesheet" />
+    <link href="/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: url('biru_biru.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        .error-message {
-            color: red;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .success-message {
-            color: green;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-    </style>
+
 </head>
 
 <body class="bg-primary">
@@ -82,7 +58,7 @@
                                     </form>
                                 </div>
                                 <div class="card-footer text-center py-3">
-                                    <div class="small">Already have an account? <a href="login.php">Login!</a></div>
+                                    <div class="small">Already have an account? <a href="/authentification/login.php">Login!</a></div>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +68,7 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
+    <script src="/js/scripts.js"></script>
     <script>
         // Password confirmation validation
         document.querySelector('form').addEventListener('submit', function(e) {
