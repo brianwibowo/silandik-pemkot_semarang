@@ -49,64 +49,108 @@ include '../koneksi.php';
                         </div>
 
                         <div class="card-body">
-                            <table id="datatablesSimple" class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Logo</th>
-                                        <th>Nama Sekolah</th>
-                                        <th>Deskripsi</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Logo</th>
-                                        <th>Nama Sekolah</th>
-                                        <th>Deskripsi</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
-                                    <?php
-                                    $no = 1;
-                                    $query = mysqli_query($conn, "SELECT * FROM data_sekolah_inklusi");
-
-                                    if (!$query) {
-                                        die("Query error: " . mysqli_error($conn));
-                                    }
-
-                                    while ($row = mysqli_fetch_assoc($query)) {
-                                    ?>
+                            <div class="table-responsive">
+                                <table id="datatablesSimple" class="table table-bordered table-hover">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td><?= $no++; ?></td>
-                                            <td>
-                                                <img src="../upload/<?= htmlspecialchars($row['logo_sekolah']); ?>" alt="Logo" width="50">
-                                            </td>
-                                            <td><?= htmlspecialchars($row['nama_sekolah']); ?></td>
-                                            <td><?= htmlspecialchars($row['deskripsi']); ?></td>
-                                            <td>
-                                                <a href="edit_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" onclick="return confirm('Yakin ingin mengubah data ini?')">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </td>
-
+                                            <th width="5%">No.</th>
+                                            <th width="25%">Logo</th>
+                                            <th width="20%">Nama Sekolah</th>
+                                            <th width="35%">Deskripsi</th>
+                                            <th width="15%">Aksi</th>
                                         </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $no = 1;
+                                        $query = mysqli_query($conn, "SELECT * FROM data_sekolah_inklusi ORDER BY nama_sekolah ASC");
+
+                                        if (!$query) {
+                                            die("Query error: " . mysqli_error($conn));
+                                        }
+
+                                        while ($row = mysqli_fetch_assoc($query)) {
+                                        ?>
+                                            <tr>
+                                                <td class="text-center"><?= $no++; ?></td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                                                        <img src="../upload/<?= htmlspecialchars($row['logo_sekolah']); ?>" 
+                                                             alt="Logo <?= htmlspecialchars($row['nama_sekolah']); ?>" 
+                                                             class="img-fluid" 
+                                                             style="max-height: 140px; max-width: 100%; object-fit: contain;">
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle"><?= htmlspecialchars($row['nama_sekolah']); ?></td>
+                                                <td class="align-middle">
+                                                    <div style="max-height: 150px; overflow-y: auto;">
+                                                        <?= nl2br(htmlspecialchars($row['deskripsi'])); ?>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <div class="d-flex justify-content-center gap-2">
+                                                        <a href="edit_sekolah_inklusi.php?id=<?= $row['id']; ?>" 
+                                                           class="btn btn-warning btn-sm" 
+                                                           title="Edit"
+                                                           onclick="return confirm('Yakin ingin mengubah data ini?')">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" 
+                                                           class="btn btn-danger btn-sm" 
+                                                           title="Hapus"
+                                                           onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php } ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </main>
         </div>
     </div>
 
     <?php include '../partials/footer.php'; ?>
+
+    <style>
+        /* Custom CSS untuk tabel */
+        .table th {
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        /* Hover effect untuk baris tabel */
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Scrollbar untuk deskripsi */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
 </body>
 </html>

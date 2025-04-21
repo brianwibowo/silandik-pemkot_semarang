@@ -1,71 +1,11 @@
-<?php
-include '../koneksi.php';
-include '../partials/head.php';
-?>
+<?php include '../partials/head.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<?php
-$id = $_GET['id'];
-$query = mysqli_query($conn, "SELECT * FROM data_sekolah_inklusi WHERE no = '$id'");
-$data = mysqli_fetch_assoc($query);
-
-if (!$data) {
-    echo "Data tidak ditemukan.";
-    exit();
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama_sekolah = $_POST['nama_sekolah'];
-    $deskripsi = $_POST['deskripsi'];
-    $logo_lama = $_POST['logo_lama'];
-
-    if (!empty($_FILES['logo']['name'])) {
-        $fileName = basename($_FILES["logo"]["name"]);
-        $targetDir = __DIR__ . '/../upload/';
-        $targetFilePath = $targetDir . $fileName;
-
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-
-        if (move_uploaded_file($_FILES["logo"]["tmp_name"], $targetFilePath)) {
-            $logo = $fileName;
-        } else {
-            echo "Gagal mengunggah logo.";
-            exit();
-        }
-    } else {
-        $logo = $logo_lama;
-    }
-
-    $update = mysqli_query($conn, "UPDATE data_sekolah_inklusi 
-        SET nama_sekolah='$nama_sekolah', logo_sekolah='$logo', deskripsi='$deskripsi' 
-        WHERE no='$id'");
-
-    if ($update) {
-        echo "
-        <script>
-            Swal.fire({
-                title: 'Sukses!',
-                text: 'Data berhasil diupdate',
-                icon: 'success',
-                confirmButtonColor: '#198754',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                window.location.href = '/silandik-semarang/kategori_data/data_sekolah_inklusi.php';
-            });
-        </script>";
-        exit();
-    } else {
-        echo "Gagal mengupdate data.";
-    }
-}
-?>
+<?php include '../koneksi.php'; ?>
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="/silandik-semarang/index.php">
-            <img src="/silandik-semarang/logo_dinas.png" width="50" height="40" alt="Logo"> SILANDIK
+            <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -91,6 +31,79 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <main>
                 <div class="container-fluid px-4">
                     <h1 class="mt-4">Edit Data Sekolah Inklusi</h1>
+
+                    <?php
+                    $id = $_GET['id'];
+                    $query = mysqli_query($conn, "SELECT * FROM data_sekolah_inklusi WHERE id = '$id'");
+                    $data = mysqli_fetch_assoc($query);
+
+                    if (!$data) {
+                        echo "Data tidak ditemukan.";
+                        exit();
+                    }
+
+                    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                        $nama_sekolah = $_POST['nama_sekolah'];
+                        $deskripsi = $_POST['deskripsi'];
+                        $logo_lama = $_POST['logo_lama'];
+
+                        if (!empty($_FILES['logo']['name'])) {
+                            $fileName = basename($_FILES["logo"]["name"]);
+                            $targetDir = __DIR__ . '/../upload/';
+                            $targetFilePath = $targetDir . $fileName;
+
+                            if (!is_dir($targetDir)) {
+                                mkdir($targetDir, 0777, true);
+                            }
+
+                            if (move_uploaded_file($_FILES["logo"]["tmp_name"], $targetFilePath)) {
+                                $logo = $fileName;
+                            } else {
+                                echo "<script>
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'Gagal mengunggah logo.',
+                                        icon: 'error',
+                                        confirmButtonColor: '#d33',
+                                        confirmButtonText: 'OK'
+                                    });
+                                </script>";
+                                return;
+                            }
+                        } else {
+                            $logo = $logo_lama;
+                        }
+
+                        $update = mysqli_query($conn, "UPDATE data_sekolah_inklusi 
+                            SET nama_sekolah='$nama_sekolah', logo_sekolah='$logo', deskripsi='$deskripsi' 
+                            WHERE id ='$id'");
+
+                        if ($update) {
+                            echo "<script>
+                                Swal.fire({
+                                    title: 'Sukses!',
+                                    text: 'Data berhasil diupdate',
+                                    icon: 'success',
+                                    confirmButtonColor: '#198754',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    window.location.href = '/silandik-semarang/kategori_data/data_sekolah_inklusi.php';
+                                });
+                            </script>";
+                        } else {
+                            echo "<script>
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Gagal mengupdate data.',
+                                    icon: 'error',
+                                    confirmButtonColor: '#d33',
+                                    confirmButtonText: 'OK'
+                                });
+                            </script>";
+                        }
+                    }
+                    ?>
+
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-school me-1"></i>
@@ -100,14 +113,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <form method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label for="nama_sekolah" class="form-label">Nama Sekolah</label>
-                                    <input type="text" name="nama_sekolah" class="form-control" id="nama_sekolah" value="<?= htmlspecialchars($data['nama_sekolah']); ?>" required>
+                                    <input type="text" name="nama_sekolah" class="form-control" id="nama_sekolah"
+                                        value="<?= htmlspecialchars($data['nama_sekolah']); ?>" required>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="logo" class="form-label">Logo Sekolah</label>
                                     <input type="file" name="logo" class="form-control" id="logo" accept="image/*" onchange="previewImage(event)">
                                     <input type="hidden" name="logo_lama" value="<?= htmlspecialchars($data['logo_sekolah']); ?>">
-                                    
                                     <div id="logoPreviewContainer" class="mt-3" style="<?= $data['logo_sekolah'] ? '' : 'display: none;' ?>">
                                         <h6>Preview Logo:</h6>
                                         <img id="logoPreview" src="../upload/<?= $data['logo_sekolah']; ?>" alt="Logo Preview" style="width: 150px; height: auto; border-radius: 5px;">

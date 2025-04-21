@@ -46,14 +46,10 @@
                                                 passwordInput.type = this.checked ? 'text' : 'password';
                                             });
                                         </script>
-                                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                            <a class="small" href="password.php">Forgot Password?</a>
-                                            <button class="btn btn-primary" type="submit">Login</button>
-                                        </div>
                                     </form>
                                 </div>
                                 <div class="card-footer text-center py-3">
-                                    <div class="small"><a href="register.php">Need an account? Sign up!</a></div>
+                                    <div class="small"> Apakah Anda ingin mendaftar menjadi Admin? Hubungi operator Anda!</a></div>
                                 </div>
                             </div>
                         </div>
@@ -65,12 +61,7 @@
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">© 2025 Silandik Semarang</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms & Conditions</a>
-                        </div>
+                        <a href="https://instagram.com/sultan.studiooo">© 2025 Sultan Studio</a>
                     </div>
                 </div>
             </footer>

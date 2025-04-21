@@ -2,64 +2,21 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php include '../koneksi.php'; ?>
 
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama_sekolah = htmlspecialchars($_POST['nama_sekolah']);
-    $deskripsi = htmlspecialchars($_POST['deskripsi']);
-
-    $targetDir = __DIR__ . '/../upload/';
-    $fileName = basename($_FILES["logo"]["name"]);
-    $targetFilePath = $targetDir . $fileName;  
-    $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
-
-    $allowTypes = ['jpg', 'jpeg', 'png'];
-    if (in_array($fileType, $allowTypes)) {
-        if (move_uploaded_file($_FILES["logo"]["tmp_name"], $targetFilePath)) {
-            $query = "INSERT INTO data_sekolah_inklusi (nama_sekolah, logo_sekolah, deskripsi) 
-                      VALUES ('$nama_sekolah', '$fileName', '$deskripsi')";
-            mysqli_query($conn, $query);
-
-            echo "
-            <script>
-                Swal.fire({
-                    title: 'Sukses!',
-                    text: 'Data berhasil disimpan',
-                    icon: 'success',
-                    confirmButtonColor: '#198754',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.href = '/silandik-semarang/kategori_data/data_sekolah_inklusi.php';
-                });
-            </script>";
-            exit();
-        } else {
-            $error = "Gagal mengunggah logo sekolah.";
-        }
-    } else {
-        $error = "Format file logo tidak didukung. Gunakan JPG, JPEG, atau PNG.";
-    }
-}
-?>
-
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="/silandik-semarang/index.php">
-            <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
+            <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
         </a>
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <ul class="navbar-nav ms-auto me-3 me-lg-4">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
                     <i class="fas fa-user fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/silandik-semarang/authentification/login.php">Login</a></li>
                     <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li>
-                        <hr class="dropdown-divider" />
-                    </li>
+                    <li><a class="dropdown-item" href="/silandik-semarang/authentification/login.php">Login</a></li>
+                    <li><hr class="dropdown-divider" /></li>
                     <li><a class="dropdown-item" href="#">Logout</a></li>
                 </ul>
             </li>
@@ -73,16 +30,81 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="container-fluid px-4">
                     <h1 class="mt-4">Tambah Data Sekolah Inklusi</h1>
 
+                    <?php
+                    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                        $nama_sekolah = htmlspecialchars($_POST['nama_sekolah']);
+                        $deskripsi = htmlspecialchars($_POST['deskripsi']);
+
+                        $targetDir = __DIR__ . '/../upload/';
+                        $fileName = basename($_FILES["logo"]["name"]);
+                        $targetFilePath = $targetDir . $fileName;
+                        $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
+                        $allowTypes = ['jpg', 'jpeg', 'png'];
+
+                        if (!is_dir($targetDir)) {
+                            mkdir($targetDir, 0777, true);
+                        }
+
+                        if (in_array($fileType, $allowTypes)) {
+                            if (move_uploaded_file($_FILES["logo"]["tmp_name"], $targetFilePath)) {
+                                $query = "INSERT INTO data_sekolah_inklusi (nama_sekolah, logo_sekolah, deskripsi) 
+                                          VALUES ('$nama_sekolah', '$fileName', '$deskripsi')";
+                                $insert = mysqli_query($conn, $query);
+
+                                if ($insert) {
+                                    echo "<script>
+                                        Swal.fire({
+                                            title: 'Sukses!',
+                                            text: 'Data berhasil disimpan',
+                                            icon: 'success',
+                                            confirmButtonColor: '#198754',
+                                            confirmButtonText: 'OK'
+                                        }).then(() => {
+                                            window.location.href = '/silandik-semarang/kategori_data/data_sekolah_inklusi.php';
+                                        });
+                                    </script>";
+                                } else {
+                                    echo "<script>
+                                        Swal.fire({
+                                            title: 'Gagal!',
+                                            text: 'Gagal menyimpan data ke database',
+                                            icon: 'error',
+                                            confirmButtonColor: '#d33',
+                                            confirmButtonText: 'OK'
+                                        });
+                                    </script>";
+                                }
+                            } else {
+                                echo "<script>
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'Gagal mengunggah logo sekolah',
+                                        icon: 'error',
+                                        confirmButtonColor: '#d33',
+                                        confirmButtonText: 'OK'
+                                    });
+                                </script>";
+                            }
+                        } else {
+                            echo "<script>
+                                Swal.fire({
+                                    title: 'Format Tidak Didukung!',
+                                    text: 'Gunakan format JPG, JPEG, atau PNG',
+                                    icon: 'warning',
+                                    confirmButtonColor: '#f0ad4e',
+                                    confirmButtonText: 'OK'
+                                });
+                            </script>";
+                        }
+                    }
+                    ?>
+
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-school me-1"></i>
                             Form Tambah Data Sekolah Inklusi
                         </div>
                         <div class="card-body">
-                            <?php if (isset($error)): ?>
-                                <div class="alert alert-danger"><?= $error; ?></div>
-                            <?php endif; ?>
-
                             <form method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label for="nama_sekolah" class="form-label">Nama Sekolah</label>
@@ -116,16 +138,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php include '../partials/footer.php'; ?>
 
     <script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function () {
-            const output = document.getElementById('logoPreview');
-            const container = document.getElementById('logoPreviewContainer');
-            output.src = reader.result;
-            container.style.display = 'block';
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('logoPreview');
+                const container = document.getElementById('logoPreviewContainer');
+                output.src = reader.result;
+                container.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
     </script>
 </body>
 </html>
