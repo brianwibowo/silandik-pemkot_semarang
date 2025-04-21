@@ -1,5 +1,6 @@
 <?php
 session_start();
-session_destroy();
-header("Location: index.php");
-exit();
+$_SESSION['role'] = 'umum'; // Ganti role ke umum
+header("Location: /silandik-semarang/index.php");
+exit;
+?>

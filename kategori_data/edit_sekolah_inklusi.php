@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: /silandik-semarang/index.php");
+    exit;
+}
+?>
 <?php include '../partials/head.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php include '../koneksi.php'; ?>

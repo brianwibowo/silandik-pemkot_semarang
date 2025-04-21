@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <?php include '../partials/head.php'; ?>
 <?php include '../koneksi.php'; ?>
 
@@ -25,10 +28,12 @@ $namaFile = isset($draft['draft_kurikulum']) ? $draft['draft_kurikulum'] : null;
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-gavel me-1"></i> Dokumen Kurikulum Inklusi</span>
                             <div>
-                                <a href="/silandik-semarang/dokumen_kurikulum/edit_kurikulum.php" class="btn btn-sm btn-warning me-2">
-                                    <i class="fas fa-edit"></i> Ubah Draft Kurikulum
-                                </a>
-                                <?php if ($namaFile): ?>
+                                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                                    <a href="/silandik-semarang/dokumen_kurikulum/edit_kurikulum.php" class="btn btn-sm btn-warning me-2">
+                                        <i class="fas fa-edit"></i> Ubah Draft Kurikulum
+                                    </a>
+                                <?php endif; ?>
+                                <?php if ($namaFile) : ?>
                                     <a href="/silandik-semarang/pdfs/<?= $namaFile ?>" class="btn btn-sm btn-primary" download>
                                         <i class="fas fa-download"></i> Unduh PDF
                                     </a>
@@ -36,9 +41,9 @@ $namaFile = isset($draft['draft_kurikulum']) ? $draft['draft_kurikulum'] : null;
                             </div>
                         </div>
                         <div class="card-body" style="height: 600px; overflow: auto;">
-                            <?php if ($namaFile): ?>
+                            <?php if ($namaFile) : ?>
                                 <embed src="/silandik-semarang/pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="100%" />
-                            <?php else: ?>
+                            <?php else : ?>
                                 <p class="text-danger">Belum ada draft kurikulum yang diunggah.</p>
                             <?php endif; ?>
                         </div>
@@ -49,4 +54,5 @@ $namaFile = isset($draft['draft_kurikulum']) ? $draft['draft_kurikulum'] : null;
     </div>
     <?php include '../partials/footer.php'; ?>
 </body>
+
 </html>

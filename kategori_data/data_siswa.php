@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <?php include '../partials/head.php'; ?>
 <?php include '../koneksi.php'; ?>
 
@@ -15,7 +18,7 @@
                     <i class="fas fa-user fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                    <li><a class="dropdown-item" href="../authentification/logout.php">Logout</a></li>
                 </ul>
             </li>
         </ul>
@@ -30,10 +33,15 @@
 
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-table me-1"></i> Data Siswa</span>
-                            <a href="/silandik-semarang/kategori_data/tambah_siswa.php" class="btn btn-success btn-sm">
-                                <i class="fas fa-plus"></i> Tambah Data Siswa
-                            </a>
+                            <div>
+                                <i class="fas fa-table me-1"></i>
+                                Daftar Data Siswa
+                            </div>
+                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                                <a href="/silandik-semarang/kategori_data/tambah_siswa.php" class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus"></i> Tambah Data Siswa
+                                </a>
+                            <?php endif; ?>
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-bordered">
@@ -70,12 +78,14 @@
                                             <td><?= htmlspecialchars($row['kelas']); ?></td>
                                             <td><?= htmlspecialchars($row['alamat']); ?></td>
                                             <td>
-                                                <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" onclick="return confirm('Yakin ingin mengubah data ini?')">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
+                                                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                                                    <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" onclick="return confirm('Yakin ingin mengubah data ini?')">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php } ?>

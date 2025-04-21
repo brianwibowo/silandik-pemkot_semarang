@@ -1,10 +1,13 @@
+<?php
+session_start();
+?>
 <?php include '../partials/head.php'; ?>
 <?php include '../koneksi.php'; ?>
 
 <?php
 $data = mysqli_query($conn, "SELECT * FROM info_sekolah_inklusi WHERE id = 1");
 $draft = mysqli_fetch_assoc($data);
-$namaFile = isset($draft['draft_sekolah'])? $draft['draft_sekolah'] : null;
+$namaFile = isset($draft['draft_sekolah']) ? $draft['draft_sekolah'] : null;
 ?>
 
 <body class="sb-nav-fixed">
@@ -25,10 +28,12 @@ $namaFile = isset($draft['draft_sekolah'])? $draft['draft_sekolah'] : null;
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-gavel me-1"></i>Informasi Sekolah Inklusi</span>
                             <div>
-                                <a href="/silandik-semarang/info_sekolah_inklusi/edit_informasi.php" class="btn btn-sm btn-warning me-2">
-                                    <i class="fas fa-edit"></i> Ubah Draft Sekolah Inklusi
-                                </a>
-                                <?php if ($namaFile): ?>
+                                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                                    <a href="/silandik-semarang/info_sekolah_inklusi/edit_informasi.php" class="btn btn-sm btn-warning me-2">
+                                        <i class="fas fa-edit"></i> Ubah Draft Sekolah Inklusi
+                                    </a>
+                                <?php endif; ?>
+                                <?php if ($namaFile) : ?>
                                     <a href="/silandik-semarang/pdfs/<?= $namaFile ?>" class="btn btn-sm btn-primary" download>
                                         <i class="fas fa-download"></i> Unduh PDF
                                     </a>
@@ -36,9 +41,9 @@ $namaFile = isset($draft['draft_sekolah'])? $draft['draft_sekolah'] : null;
                             </div>
                         </div>
                         <div class="card-body" style="height: 600px; overflow: auto;">
-                            <?php if ($namaFile): ?>
+                            <?php if ($namaFile) : ?>
                                 <embed src="/silandik-semarang/pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="100%" />
-                            <?php else: ?>
+                            <?php else : ?>
                                 <p class="text-danger">Belum ada draft kurikulum yang diunggah.</p>
                             <?php endif; ?>
                         </div>
@@ -49,4 +54,5 @@ $namaFile = isset($draft['draft_sekolah'])? $draft['draft_sekolah'] : null;
     </div>
     <?php include '../partials/footer.php'; ?>
 </body>
+
 </html>

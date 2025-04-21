@@ -1,4 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: /silandik-semarang/index.php");
+    exit;
+}
+?>
+<?php
 include '../koneksi.php';
 
 if (isset($_GET['id'])) {

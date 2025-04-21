@@ -1,4 +1,7 @@
 <?php
+session_start();
+?>
+<?php
 include '../partials/head.php';
 include '../koneksi.php';
 ?>
@@ -17,7 +20,7 @@ include '../koneksi.php';
                     <i class="fas fa-user fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                    <li><a class="dropdown-item" href="../authentification/logout.php">Logout</a></li>
                 </ul>
             </li>
         </ul>
@@ -37,10 +40,12 @@ include '../koneksi.php';
                                 <i class="fas fa-table me-1"></i>
                                 Daftar Sekolah Inklusi
                             </div>
-                            <a href="/silandik-semarang/kategori_data/tambah_sekolah_inklusi.php" class="btn btn-success btn-sm">
-                                <i class="fas fa-plus"></i>
-                                Tambah Data Sekolah
-                            </a>
+                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                                <a href="/silandik-semarang/kategori_data/tambah_sekolah_inklusi.php" class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                    Tambah Data Sekolah
+                                </a>
+                            <?php endif; ?>
                         </div>
 
                         <div class="card-body">
@@ -55,6 +60,7 @@ include '../koneksi.php';
                                             <th width="15%">Aksi</th>
                                         </tr>
                                     </thead>
+
                                     <tbody>
                                         <?php
                                         $no = 1;
@@ -70,10 +76,7 @@ include '../koneksi.php';
                                                 <td class="text-center"><?= $no++; ?></td>
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
-                                                        <img src="../upload/<?= htmlspecialchars($row['logo_sekolah']); ?>" 
-                                                             alt="Logo <?= htmlspecialchars($row['nama_sekolah']); ?>" 
-                                                             class="img-fluid" 
-                                                             style="max-height: 140px; max-width: 100%; object-fit: contain;">
+                                                        <img src="../upload/<?= htmlspecialchars($row['logo_sekolah']); ?>" alt="Logo <?= htmlspecialchars($row['nama_sekolah']); ?>" class="img-fluid" style="max-height: 140px; max-width: 100%; object-fit: contain;">
                                                     </div>
                                                 </td>
                                                 <td class="align-middle"><?= htmlspecialchars($row['nama_sekolah']); ?></td>
@@ -83,20 +86,16 @@ include '../koneksi.php';
                                                     </div>
                                                 </td>
                                                 <td class="align-middle text-center">
-                                                    <div class="d-flex justify-content-center gap-2">
-                                                        <a href="edit_sekolah_inklusi.php?id=<?= $row['id']; ?>" 
-                                                           class="btn btn-warning btn-sm" 
-                                                           title="Edit"
-                                                           onclick="return confirm('Yakin ingin mengubah data ini?')">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" 
-                                                           class="btn btn-danger btn-sm" 
-                                                           title="Hapus"
-                                                           onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
-                                                    </div>
+                                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                                                        <div class="d-flex justify-content-center gap-2">
+                                                            <a href="edit_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" title="Edit" onclick="return confirm('Yakin ingin mengubah data ini?')">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                            <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                                <i class="fas fa-trash"></i>
+                                                            </a>
+                                                        </div>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -118,34 +117,35 @@ include '../koneksi.php';
             vertical-align: middle;
             text-align: center;
         }
-        
+
         .table td {
             vertical-align: middle;
         }
-        
+
         /* Hover effect untuk baris tabel */
         .table-hover tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.05);
         }
-        
+
         /* Scrollbar untuk deskripsi */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 5px;
         }
-        
+
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
     </style>
 </body>
+
 </html>

@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <?php include 'partials/head.php'; ?>
 <?php include 'koneksi.php'; ?>
 

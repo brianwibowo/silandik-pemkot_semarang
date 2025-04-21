@@ -56,14 +56,22 @@
                 </div>
             </div>
         </div>
-        <!-- Tombol Login Admin -->
-        <div class="text-center p-3">
-            <a href="/silandik-semarang/authentification/login.php" class="btn btn-success w-100">Login Admin &rarr;</a>
-        </div>
+        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+            <!-- Sambutan untuk Admin -->
+            <div class="text-center p-3">
+                <span class="fw-bold text-success">Halo, Admin!</span>
+            </div>
+        <?php else : ?>
+            <!-- Tombol Login Admin -->
+            <div class="text-center p-3">
+                <a href="/silandik-semarang/authentification/login.php" class="btn btn-success w-100">Login Admin &rarr;</a>
+            </div>
+        <?php endif; ?>
         <!-- Footer -->
         <div class="sb-sidenav-footer">
-            <div class="small">Developed by:</div>
-            Sultan Studio
+            <div class="small">
+                Developed by: <a href="https://instagram.com/sultan.studiooo" target="_blank" style="text-decoration: none;">Sultan Studio</a>
+            </div>
         </div>
     </nav>
 </div>
