@@ -1,5 +1,6 @@
 <?php include 'partials/head.php'; ?>
 <?php include 'koneksi.php'; ?>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php"><img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK</a>
@@ -8,9 +9,6 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"><i class="fas fa-user fa-fw"></i></a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Login</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><hr class="dropdown-divider" /></li>
                     <li><a class="dropdown-item" href="#">Logout</a></li>
                 </ul>
             </li>
@@ -27,13 +25,25 @@
 
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-gavel me-1"></i> Dasar Hukum</span>
-                            <a href="pdfs/dasar_hukum.pdf" class="btn btn-sm btn-primary" download>
-                                <i class="fas fa-download"></i> Unduh PDF
-                            </a>
+                            <span><i class="fas fa-gavel me-1"></i> Draft Hukum</span>
+                            <?php
+                            include 'koneksi.php';
+                            $data = mysqli_query($conn, "SELECT * FROM dasar_hukum WHERE id = 1");
+                            $draft = mysqli_fetch_assoc($data);
+                            $namaFile = isset($draft['draft_hukum']) ? $draft['draft_hukum'] : null;
+                            ?>
+                            <?php if ($namaFile) : ?>
+                                <a href="/silandik-semarang/pdfs/<?= $namaFile ?>" class="btn btn-sm btn-success" download>
+                                    <i class="fas fa-download"></i> Unduh Draft
+                                </a>
+                            <?php endif; ?>
                         </div>
-                        <div class="card-body" style="height: 600px; overflow: auto;">
-                            <embed src="pdfs/dasar_hukum.pdf" type="application/pdf" width="100%" height="100%" />
+                        <div class="card-body">
+                            <?php if ($namaFile) : ?>
+                                <embed src="/silandik-semarang/pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="400px" />
+                            <?php else : ?>
+                                <p class="text-danger">Belum ada draft hukum yang tersedia.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -85,4 +95,5 @@
     </div>
     <?php include 'partials/footer.php'; ?>
 </body>
+
 </html>

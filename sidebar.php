@@ -39,9 +39,10 @@
                 </a>
                 <div class="collapse" id="collapseInformasi" aria-labelledby="headingInformasi" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="/silandik-semarang/informasi_inklusi.pptx">Download</a>
+                        <a class="nav-link" href="/silandik-semarang/info_sekolah_inklusi/informasi_sekolah_inklusi.php">Informasi Sekolah Inklusi</a>
                     </nav>
                 </div>
+                </a>
 
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDokumen" aria-expanded="false" aria-controls="collapseDokumen">
                     <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
@@ -50,7 +51,7 @@
                 </a>
                 <div class="collapse" id="collapseDokumen" aria-labelledby="headingDokumen" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="#">Dokumen</a>
+                        <a class="nav-link" href="/silandik-semarang/dokumen_kurikulum/dokumen_kurikulum_inklusi.php">Dokumen Kurikulum Inklusi</a>
                     </nav>
                 </div>
             </div>

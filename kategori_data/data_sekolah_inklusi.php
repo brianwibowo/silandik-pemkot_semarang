@@ -17,11 +17,6 @@ include '../koneksi.php';
                     <i class="fas fa-user fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/silandik-semarang/authentification/login.php">Login</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li>
-                        <hr class="dropdown-divider" />
-                    </li>
                     <li><a class="dropdown-item" href="#">Logout</a></li>
                 </ul>
             </li>
@@ -54,7 +49,7 @@ include '../koneksi.php';
                                     <thead class="table-light">
                                         <tr>
                                             <th width="5%">No.</th>
-                                            <th width="25%">Logo</th>
+                                            <th width="25%">Logo/Gambar Sekolah</th>
                                             <th width="20%">Nama Sekolah</th>
                                             <th width="35%">Deskripsi</th>
                                             <th width="15%">Aksi</th>

@@ -16,9 +16,6 @@
                     <i class="fas fa-user fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><a class="dropdown-item" href="/silandik-semarang/authentification/login.php">Login</a></li>
-                    <li><hr class="dropdown-divider" /></li>
                     <li><a class="dropdown-item" href="#">Logout</a></li>
                 </ul>
             </li>
@@ -62,7 +59,7 @@
                                 echo "<script>
                                     Swal.fire({
                                         title: 'Error!',
-                                        text: 'Gagal mengunggah logo.',
+                                        text: 'Gagal mengunggah gambar.',
                                         icon: 'error',
                                         confirmButtonColor: '#d33',
                                         confirmButtonText: 'OK'
@@ -118,7 +115,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="logo" class="form-label">Logo Sekolah</label>
+                                    <label for="logo" class="form-label">Logo/Gambar Sekolah</label>
                                     <input type="file" name="logo" class="form-control" id="logo" accept="image/*" onchange="previewImage(event)">
                                     <input type="hidden" name="logo_lama" value="<?= htmlspecialchars($data['logo_sekolah']); ?>">
                                     <div id="logoPreviewContainer" class="mt-3" style="<?= $data['logo_sekolah'] ? '' : 'display: none;' ?>">
