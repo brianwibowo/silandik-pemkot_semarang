@@ -8,18 +8,25 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>Login - Silandik</title>
-    <link href="/css/styles.css" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/silandik-semarang/css/styles.css" rel="stylesheet" />
+    
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="bg-primary">
+<body class="bg-white"> 
+
     <div id="layoutAuthentication">
         <div id="layoutAuthentication_content">
             <main>
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-5">
-                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                            <div class="text-center mt-5">
+                                <img src="/silandik-semarang/assets/logo.png" alt="Logo Silandik" class="img-fluid" style="max-width: 100px;">
+                            </div>
+                            <div class="card shadow-lg border-0 rounded-lg mt-4">
                                 <div class="card-header bg-primary text-white">
                                     <h3 class="text-center font-weight-light my-2">Login</h3>
                                 </div>
@@ -40,16 +47,13 @@
                                             <input class="form-check-input" id="inputRememberPassword" type="checkbox" />
                                             <label class="form-check-label" for="inputRememberPassword">Show Password</label>
                                         </div>
-                                        <script>
-                                            document.getElementById('inputRememberPassword').addEventListener('change', function () {
-                                                const passwordInput = document.getElementById('inputPassword');
-                                                passwordInput.type = this.checked ? 'text' : 'password';
-                                            });
-                                        </script>
+                                        <div class="d-flex justify-content-center">
+                                            <button type="submit" class="btn btn-primary">Login</button>
+                                        </div>
                                     </form>
                                 </div>
                                 <div class="card-footer text-center py-3">
-                                    <div class="small"> Apakah Anda ingin mendaftar menjadi Admin? Hubungi operator Anda!</a></div>
+                                    <div class="small">Apakah Anda ingin mendaftar menjadi Admin? Hubungi operator Anda!</div>
                                 </div>
                             </div>
                         </div>
@@ -67,8 +71,16 @@
             </footer>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="/js/scripts.js"></script>
+    <script src="/silandik-semarang/js/scripts.js"></script>
+
+    <script>
+        document.getElementById('inputRememberPassword').addEventListener('change', function () {
+            const passwordInput = document.getElementById('inputPassword');
+            passwordInput.type = this.checked ? 'text' : 'password';
+        });
+    </script>
 </body>
 
 </html>
