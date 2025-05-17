@@ -18,7 +18,11 @@ session_start();
                     <i class="fas fa-user fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="authentification/logout.php">Logout</a></li>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                        <li><a class="dropdown-item" href="authentification/logout.php">Logout</a></li>
+                    <?php else : ?>
+                        <li><a class="dropdown-item" href="authentification/login.php">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </li>
         </ul>
@@ -53,9 +57,12 @@ session_start();
                         </div>
                         <div class="card-body">
                             <?php if ($namaFile) : ?>
-                                <object data="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" type="application/pdf" width="100%" height="400px">
-                                    <p>PDF tidak dapat ditampilkan. <a href="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" download="<?= htmlspecialchars($namaFile) ?>">Klik di sini untuk mengunduh.</a></p>
-                                </object>
+                                <div class="pdf-container" style="position: relative; width: 100%; height: 400px; overflow: auto; -webkit-overflow-scrolling: touch;">
+                                    <iframe src="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" type="application/pdf" width="100%" height="100%" style="border: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+                                </div>
+                                <div class="mt-2 mb-2 d-flex justify-content-center">
+                                    <a href="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-primary" target="_blank">Buka PDF di Tab Baru</a>
+                                </div>
                             <?php else : ?>
                                 <p class="text-danger">Belum ada draft hukum yang tersedia.</p>
                             <?php endif; ?>
@@ -118,7 +125,7 @@ session_start();
             icon: 'success',
             title: 'Logout Berhasil!',
             text: 'Anda telah berhasil keluar dari sistem.',
-            confirmButtonColor: '#198754', // Ganti ke warna merah sesuai permintaan
+            confirmButtonColor: '#dc3545', // Warna merah (danger) dari Bootstrap
             confirmButtonText: 'OK'
         });
         <?php 
