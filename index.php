@@ -1,18 +1,29 @@
 <?php
 session_start();
+include 'koneksi.php';
+include 'partials/head.php';
 ?>
-<?php include 'partials/head.php'; ?>
-<?php include 'koneksi.php'; ?>
-
+<!DOCTYPE html>
+<html>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="index.php"><img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK</a>
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <a class="navbar-brand ps-3" href="index.php">
+            <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
+        </a>
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"><i class="fas fa-user fa-fw"></i></a>
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user fa-fw"></i>
+                </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
+                        <li><a class="dropdown-item" href="authentification/logout.php">Logout</a></li>
+                    <?php else : ?>
+                        <li><a class="dropdown-item" href="authentification/login.php">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </li>
         </ul>
@@ -30,20 +41,29 @@ session_start();
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-gavel me-1"></i> Draft Hukum</span>
                             <?php
-                            include 'koneksi.php';
+                            // Hindari include koneksi lagi karena sudah di-include di atas
                             $data = mysqli_query($conn, "SELECT * FROM dasar_hukum WHERE id = 1");
-                            $draft = mysqli_fetch_assoc($data);
-                            $namaFile = isset($draft['draft_hukum']) ? $draft['draft_hukum'] : null;
+                            if ($data) {
+                                $draft = mysqli_fetch_assoc($data);
+                                $namaFile = isset($draft['draft_hukum']) ? trim($draft['draft_hukum']) : null;
+                            } else {
+                                $namaFile = null;
+                            }
                             ?>
                             <?php if ($namaFile) : ?>
-                                <a href="pdfs/<?= $namaFile ?>" class="btn btn-sm btn-success" download>
+                                <a href="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-success" target="_blank" download="<?= htmlspecialchars($namaFile) ?>">
                                     <i class="fas fa-download"></i> Unduh Draft
                                 </a>
                             <?php endif; ?>
                         </div>
                         <div class="card-body">
                             <?php if ($namaFile) : ?>
-                                <embed src="pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="400px" />
+                                <div class="pdf-container" style="position: relative; width: 100%; height: 400px; overflow: auto; -webkit-overflow-scrolling: touch;">
+                                    <iframe src="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" type="application/pdf" width="100%" height="100%" style="border: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+                                </div>
+                                <div class="mt-2 mb-2 d-flex justify-content-center">
+                                    <a href="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-primary" target="_blank">Buka PDF di Tab Baru</a>
+                                </div>
                             <?php else : ?>
                                 <p class="text-danger">Belum ada draft hukum yang tersedia.</p>
                             <?php endif; ?>
@@ -78,7 +98,7 @@ session_start();
                                     <?php
                                     $no = 1;
                                     $query = mysqli_query($conn, "SELECT * FROM data_siswa");
-                                    while ($row = mysqli_fetch_assoc($query)) {
+                                    while ($query && $row = mysqli_fetch_assoc($query)) {
                                     ?>
                                         <tr>
                                             <td><?= $no++; ?></td>
@@ -96,7 +116,27 @@ session_start();
             </main>
         </div>
     </div>
+    
+    <!-- Script SweetAlert untuk notifikasi logout -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Alert untuk logout berhasil
+        <?php if (isset($_SESSION['logout_success']) && $_SESSION['logout_success']): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Logout Berhasil!',
+            text: 'Anda telah berhasil keluar dari sistem.',
+            confirmButtonColor: '#dc3545', // Warna merah (danger) dari Bootstrap
+            confirmButtonText: 'OK'
+        });
+        <?php 
+            // Hapus flag setelah ditampilkan
+            unset($_SESSION['logout_success']);
+        endif; 
+        ?>
+    </script>
+    
     <?php include 'partials/footer.php'; ?>
 </body>
 
-</html>
+</hmtl>

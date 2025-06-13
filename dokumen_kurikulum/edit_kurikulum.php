@@ -1,18 +1,22 @@
 <?php
 session_start();
+include '../config.php';
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: index.php");
+    header("Location: " . $base_url . "index.php");
     exit;
 }
+
+include '../partials/head.php';
+include '../koneksi.php';
 ?>
-<?php include '../partials/head.php'; ?>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php include '../koneksi.php'; ?>
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="index.php">
-            <img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
+        <a class="navbar-brand ps-3" href="<?= $base_url ?>index.php">
+            <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -21,6 +25,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
     <div id="layoutSidenav">
         <?php include '../sidebar.php'; ?>
+
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
@@ -42,19 +47,17 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                         }
 
                         if ($uploadOk) {
-                            // Hapus file lama
                             $cek = mysqli_query($conn, "SELECT draft_kurikulum FROM dokumen_kurikulum_inklusi WHERE id = 1");
                             if ($row = mysqli_fetch_assoc($cek)) {
-                                $oldFile = $targetDir . $row['draft_kurikulum '];
+                                $oldFile = $targetDir . $row['draft_kurikulum'];
                                 if (file_exists($oldFile)) {
                                     unlink($oldFile);
                                 }
                             }
 
-                            // Upload file baru
                             if (move_uploaded_file($_FILES["draft"]["tmp_name"], $targetFile)) {
                                 if (mysqli_num_rows($cek) > 0) {
-                                    mysqli_query($conn, "UPDATE dokumen_kurikulum_inklusi SET draft_kurikulum  = '$fileName' WHERE id = 1");
+                                    mysqli_query($conn, "UPDATE dokumen_kurikulum_inklusi SET draft_kurikulum = '$fileName' WHERE id = 1");
                                 } else {
                                     mysqli_query($conn, "INSERT INTO dokumen_kurikulum_inklusi (id, draft_kurikulum) VALUES (1, '$fileName')");
                                 }
@@ -67,7 +70,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                         confirmButtonColor: '#198754',
                                         confirmButtonText: 'OK'
                                     }).then(() => {
-                                        window.location.href = 'dokumen_kurikulum/dokumen_kurikulum_inklusi.php';
+                                        window.location.href = '{$base_url}dokumen_kurikulum/dokumen_kurikulum_inklusi.php';
                                     });
                                 </script>";
                             } else {
@@ -91,7 +94,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                     <input type="file" name="draft" class="form-control" accept="application/pdf" required>
                                 </div>
                                 <button type="submit" class="btn btn-warning"><i class="fas fa-upload"></i> Upload Draft Baru</button>
-                                <a href="dokumen_kurikulum/dokumen_kurikulum_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                                <a href="<?= $base_url ?>dokumen_kurikulum/dokumen_kurikulum_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                             </form>
                         </div>
                     </div>

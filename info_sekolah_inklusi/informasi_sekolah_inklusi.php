@@ -17,6 +17,16 @@ $namaFile = $draft['draft_sekolah'] ?? null;
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
         </button>
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user fa-fw"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="../authentification/logout.php">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
     </nav>
 
     <div id="layoutSidenav">
@@ -42,12 +52,18 @@ $namaFile = $draft['draft_sekolah'] ?? null;
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <div class="card-body" style="height: 600px; overflow: auto;">
+                        <div class="card-body">
                             <?php if ($namaFile) : ?>
-                                <embed src="../pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="100%" />
+                                <div class="pdf-container" style="position: relative; width: 100%; height: 400px; overflow: auto; -webkit-overflow-scrolling: touch;">
+                                    <iframe src="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" type="application/pdf" width="100%" height="100%" style="border: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+                                </div>
+                                <div class="mt-2 mb-2 d-flex justify-content-center">
+                                    <a href="<?= $base_url ?>pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-primary" target="_blank">Buka PDF di Tab Baru</a>
+                                </div>
                             <?php else : ?>
-                                <p class="text-danger">Belum ada draft yang diunggah.</p>
+                                <p class="text-danger">Belum ada draft hukum yang tersedia.</p>
                             <?php endif; ?>
+                        </div>
                         </div>
                     </div>
                 </div>

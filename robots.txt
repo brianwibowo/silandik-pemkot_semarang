@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: 
+Sitemap: https://silandik-semarang.com/sitemap.xml

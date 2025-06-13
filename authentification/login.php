@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../koneksi.php';
+include '../config.php';
 
 $success = false;
 $error = "";
@@ -43,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="row justify-content-center">
             <div class="col-lg-5">
                 <div class="text-center mb-3">
-                    <img src="assets/logo.png" alt="Logo Silandik" style="max-width: 100px;">
+                    <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="60" height="40"> 
                 </div>
                 <div class="card shadow-lg">
                     <div class="card-header bg-primary text-white text-center">

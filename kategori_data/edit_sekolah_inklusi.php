@@ -1,32 +1,25 @@
 <?php
 session_start();
+include '../config.php';
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
 }
-?>
-<?php include '../partials/head.php'; ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php include '../koneksi.php'; ?>
 
+include '../partials/head.php';
+include '../koneksi.php';
+?>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="index.php">
-            <img src="logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
+        <a class="navbar-brand ps-3" href="<?= $base_url ?>index.php">
+            <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
         </button>
-        <ul class="navbar-nav ms-auto me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-user fa-fw"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
     </nav>
 
     <div id="layoutSidenav">
@@ -91,7 +84,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                     confirmButtonColor: '#198754',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                    window.location.href = 'kategori_data/data_sekolah_inklusi.php';
+                                    window.location.href = 'data_sekolah_inklusi.php';
                                 });
                             </script>";
                         } else {
@@ -137,7 +130,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                 </div>
 
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
-                                <a href="kategori_data/data_sekolah_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                                <a href="data_sekolah_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                             </form>
                         </div>
                     </div>

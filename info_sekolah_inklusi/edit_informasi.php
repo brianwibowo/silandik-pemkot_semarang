@@ -1,18 +1,22 @@
 <?php
 session_start();
+include '../config.php';
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
 }
+
+include '../partials/head.php';
+include '../koneksi.php';
 ?>
-<?php include '../partials/head.php'; ?>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php include '../koneksi.php'; ?>
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="index.php">
-            <img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
+        <a class="navbar-brand ps-3" href="<?= $base_url ?>index.php">
+            <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -29,35 +33,24 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $targetDir = __DIR__ . '/../pdfs/';
-                        $fileType = strtolower(pathinfo($_FILES["draft"]["name"], PATHINFO_EXTENSION));
                         $fileName = basename($_FILES["draft"]["name"]);
+                        $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                         $targetFile = $targetDir . $fileName;
-                        $uploadOk = 1;
 
-                        if ($fileType != "pdf") {
-                            echo "<script>
-                                Swal.fire('Gagal', 'Hanya file PDF yang diperbolehkan!', 'error');
-                            </script>";
-                            $uploadOk = 0;
-                        }
-
-                        if ($uploadOk) {
-                            // Hapus file lama
+                        if ($fileType !== "pdf") {
+                            echo "<script>Swal.fire('Gagal', 'Hanya file PDF yang diperbolehkan!', 'error');</script>";
+                        } else {
                             $cek = mysqli_query($conn, "SELECT draft_sekolah FROM info_sekolah_inklusi WHERE id = 1");
                             if ($row = mysqli_fetch_assoc($cek)) {
                                 $oldFile = $targetDir . $row['draft_sekolah'];
-                                if (file_exists($oldFile)) {
-                                    unlink($oldFile);
-                                }
+                                if (file_exists($oldFile)) unlink($oldFile);
                             }
 
-                            // Upload file baru
                             if (move_uploaded_file($_FILES["draft"]["tmp_name"], $targetFile)) {
-                                if (mysqli_num_rows($cek) > 0) {
-                                    mysqli_query($conn, "UPDATE info_sekolah_inklusi SET draft_sekolah  = '$fileName' WHERE id = 1");
-                                } else {
-                                    mysqli_query($conn, "INSERT INTO info_sekolah_inklusi (id, draft_sekolah) VALUES (1, '$fileName')");
-                                }
+                                $query = mysqli_num_rows($cek) > 0
+                                    ? "UPDATE info_sekolah_inklusi SET draft_sekolah = '$fileName' WHERE id = 1"
+                                    : "INSERT INTO info_sekolah_inklusi (id, draft_sekolah) VALUES (1, '$fileName')";
+                                mysqli_query($conn, $query);
 
                                 echo "<script>
                                     Swal.fire({
@@ -67,13 +60,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                         confirmButtonColor: '#198754',
                                         confirmButtonText: 'OK'
                                     }).then(() => {
-                                        window.location.href = 'info_sekolah_inklusi/informasi_sekolah_inklusi.php';
+                                        window.location.href = 'informasi_sekolah_inklusi.php';
                                     });
                                 </script>";
                             } else {
-                                echo "<script>
-                                    Swal.fire('Gagal', 'Terjadi kesalahan saat mengunggah file.', 'error');
-                                </script>";
+                                echo "<script>Swal.fire('Gagal', 'Gagal mengunggah file.', 'error');</script>";
                             }
                         }
                     }
@@ -81,8 +72,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
                     <div class="card mb-4">
                         <div class="card-header">
-                            <i class="fas fa-upload me-1"></i>
-                            Upload Draft Informasi Terbaru
+                            <i class="fas fa-upload me-1"></i> Upload Draft Informasi Terbaru
                         </div>
                         <div class="card-body">
                             <form method="POST" enctype="multipart/form-data">
@@ -90,8 +80,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                     <label class="form-label">Upload PDF</label>
                                     <input type="file" name="draft" class="form-control" accept="application/pdf" required>
                                 </div>
-                                <button type="submit" class="btn btn-warning"><i class="fas fa-upload"></i>Upload Draft Baru</button>
-                                <a href="info_sekolah_inklusi/informasi_sekolah_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                                <button type="submit" class="btn btn-warning"><i class="fas fa-upload"></i> Upload Draft Baru</button>
+                                <a href="informasi_sekolah_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                             </form>
                         </div>
                     </div>
