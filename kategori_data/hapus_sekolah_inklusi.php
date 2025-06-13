@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /silandik-semarang/index.php");
+    header("Location: index.php");
     exit;
 }
 ?>
@@ -14,7 +14,7 @@ if (isset($_GET['id'])) {
     $query = "DELETE FROM data_sekolah_inklusi WHERE id = '$id'";
 
     if (mysqli_query($conn, $query)) {
-        header("Location: /silandik-semarang/kategori_data/data_sekolah_inklusi.php");
+        header("Location: kategori_data/data_sekolah_inklusi.php");
         exit();
     } else {
         echo "Error: " . mysqli_error($conn);

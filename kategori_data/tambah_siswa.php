@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /silandik-semarang/index.php");
+    header("Location: index.php");
     exit;
 }
 ?>
@@ -11,8 +11,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="/silandik-semarang/index.php">
-            <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
+        <a class="navbar-brand ps-3" href="index.php">
+            <img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -62,11 +62,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                     confirmButtonColor: '#198754',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                    window.location.href = '/silandik-semarang/kategori_data/data_siswa.php';
+                                    window.location.href = 'kategori_data/data_siswa.php';
                                 });
                             </script>";
 
-                                header("Location: /silandik-semarang/kategori_data/data_siswa.php");
+                                header("Location: kategori_data/data_siswa.php");
                             }
                             ?>
 
@@ -88,7 +88,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                     <textarea name="alamat" class="form-control" required></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Tambah</button>
-                                <a href="/silandik-semarang/kategori_data/data_siswa.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                                <a href="kategori_data/data_siswa.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                             </form>
                         </div>
                     </div>

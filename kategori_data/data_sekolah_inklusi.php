@@ -8,8 +8,8 @@ include '../koneksi.php';
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="/silandik-semarang/index.php">
-            <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
+        <a class="navbar-brand ps-3" href="index.php">
+            <img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -41,7 +41,7 @@ include '../koneksi.php';
                                 Daftar Sekolah Inklusi
                             </div>
                             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
-                                <a href="/silandik-semarang/kategori_data/tambah_sekolah_inklusi.php" class="btn btn-success btn-sm">
+                                <a href="kategori_data/tambah_sekolah_inklusi.php" class="btn btn-success btn-sm">
                                     <i class="fas fa-plus"></i>
                                     Tambah Data Sekolah
                                 </a>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: /silandik-semarang/index.php");
+    header("Location: index.php");
     exit;
 }
 ?>
@@ -11,8 +11,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="/silandik-semarang/index.php">
-            <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
+        <a class="navbar-brand ps-3" href="index.php">
+            <img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -67,7 +67,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                         confirmButtonColor: '#198754',
                                         confirmButtonText: 'OK'
                                     }).then(() => {
-                                        window.location.href = '/silandik-semarang/regulasi/dasar_hukum.php';
+                                        window.location.href = 'regulasi/dasar_hukum.php';
                                     });
                                 </script>";
                             } else {
@@ -91,7 +91,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                                     <input type="file" name="draft" class="form-control" accept="application/pdf" required>
                                 </div>
                                 <button type="submit" class="btn btn-warning"><i class="fas fa-upload"></i> Upload Draft Baru</button>
-                                <a href="/silandik-semarang/regulasi/dasar_hukum.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                                <a href="regulasi/dasar_hukum.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                             </form>
                         </div>
                     </div>

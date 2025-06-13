@@ -6,7 +6,7 @@ session_start();
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="index.php"><img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK</a>
+        <a class="navbar-brand ps-3" href="index.php"><img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK</a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
             <li class="nav-item dropdown">
@@ -36,14 +36,14 @@ session_start();
                             $namaFile = isset($draft['draft_hukum']) ? $draft['draft_hukum'] : null;
                             ?>
                             <?php if ($namaFile) : ?>
-                                <a href="/silandik-semarang/pdfs/<?= $namaFile ?>" class="btn btn-sm btn-success" download>
+                                <a href="pdfs/<?= $namaFile ?>" class="btn btn-sm btn-success" download>
                                     <i class="fas fa-download"></i> Unduh Draft
                                 </a>
                             <?php endif; ?>
                         </div>
                         <div class="card-body">
                             <?php if ($namaFile) : ?>
-                                <embed src="/silandik-semarang/pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="400px" />
+                                <embed src="pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="400px" />
                             <?php else : ?>
                                 <p class="text-danger">Belum ada draft hukum yang tersedia.</p>
                             <?php endif; ?>

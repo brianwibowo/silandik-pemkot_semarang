@@ -13,7 +13,7 @@ $namaFile = isset($draft['draft_hukum']) ? $draft['draft_hukum'] : null;
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">
-            <img src="/silandik-semarang/logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
+            <img src="logo_dinas.png" alt="Logo" width="50" height="40">SILANDIK
         </a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -43,12 +43,12 @@ $namaFile = isset($draft['draft_hukum']) ? $draft['draft_hukum'] : null;
                             <span><i class="fas fa-gavel me-1"></i> Dasar Hukum</span>
                             <div>
                                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                    <a href="/silandik-semarang/regulasi/edit_dasar_hukum.php" class="btn btn-sm btn-warning me-2">
+                                    <a href="regulasi/edit_dasar_hukum.php" class="btn btn-sm btn-warning me-2">
                                         <i class="fas fa-edit"></i> Ubah Draft Hukum
                                     </a>
                                 <?php endif; ?>
                                 <?php if ($namaFile): ?>
-                                    <a href="/silandik-semarang/pdfs/<?= $namaFile ?>" class="btn btn-sm btn-primary" download>
+                                    <a href="pdfs/<?= $namaFile ?>" class="btn btn-sm btn-primary" download>
                                         <i class="fas fa-download"></i> Unduh PDF
                                     </a>
                                 <?php endif; ?>
@@ -56,7 +56,7 @@ $namaFile = isset($draft['draft_hukum']) ? $draft['draft_hukum'] : null;
                         </div>
                         <div class="card-body" style="height: 600px; overflow: auto;">
                             <?php if ($namaFile): ?>
-                                <embed src="/silandik-semarang/pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="100%" />
+                                <embed src="pdfs/<?= $namaFile ?>" type="application/pdf" width="100%" height="100%" />
                             <?php else: ?>
                                 <p class="text-danger">Belum ada draft hukum yang diunggah.</p>
                             <?php endif; ?>
