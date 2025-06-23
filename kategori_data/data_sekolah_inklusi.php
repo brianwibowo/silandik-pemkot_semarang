@@ -146,7 +146,7 @@ include '../koneksi.php';
                                         <h5 class="card-title text-primary fw-bold mb-2 school-title">
                                             <?= htmlspecialchars($row['nama_sekolah']); ?>
                                         </h5>
-                                        <p class="card-text text-muted mb-3 school-desc" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                                        <p class="card-text text-muted mb-3 school-desc" style="display: -webkit-box;  -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
                                             <?= nl2br(htmlspecialchars($row['deskripsi'])); ?>
                                         </p>
                                         
