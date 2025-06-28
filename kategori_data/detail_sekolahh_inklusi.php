@@ -497,7 +497,8 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                     </div>
                 </div>
 
-                <!-- Data Siswa -->
+                <!-- Data Siswa (Hanya untuk admin/pengurus) -->
+                <?php if ($isAdminOrPengurus): ?>
                 <div class="students-table">
                     <div class="section-card">
                         <div class="section-header">
@@ -512,9 +513,7 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                                         <th>Nama</th>
                                         <th style="width: 80px;">JK</th>
                                         <th style="width: 80px;">Kelas</th>
-                                        <?php if ($isAdminOrPengurus): ?>
-                                            <th style="width: 100px;">Aksi</th>
-                                        <?php endif; ?>
+                                        <th style="width: 100px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -534,12 +533,10 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center"><?= sanitizeOutput($row['kelas']); ?></td>
-                                            <?php if ($isAdminOrPengurus): ?>
-                                                <td class="text-center">
-                                                    <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></a>
-                                                    <a href="hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('Hapus siswa ini?')"><i class="fas fa-trash"></i></a>
-                                                </td>
-                                            <?php endif; ?>
+                                            <td class="text-center">
+                                                <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></a>
+                                                <a href="hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('Hapus siswa ini?')"><i class="fas fa-trash"></i></a>
+                                            </td>
                                         </tr>
                                     <?php endwhile; ?>
                                 </tbody>
@@ -547,6 +544,8 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
+
                 <!-- Galeri Sekolah -->
                 <div class="section-card mt-4">
                     <div class="section-header">

@@ -3,8 +3,8 @@ session_start();
 require '../koneksi.php';
 include '../config.php';
 
-// Cek apakah user sudah login dan role user
-if (!isset($_SESSION['email']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
+// Cek apakah umum sudah login dan role umum
+if (!isset($_SESSION['email']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'umum') {
     header("Location: ../index.php");
     exit;
 }
@@ -15,7 +15,7 @@ $error = "";
 
 // Hanya proses jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Cek apakah user sudah punya pending request
+    // Cek apakah umum sudah punya pending request
     $check_query = "SELECT request_pengurus FROM users WHERE email = ?";
     $stmt = mysqli_prepare($conn, $check_query);
     mysqli_stmt_bind_param($stmt, "s", $email);
@@ -23,8 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $result = mysqli_stmt_get_result($stmt);
 
     if ($result && mysqli_num_rows($result) === 1) {
-        $user = mysqli_fetch_assoc($result);
-        if ($user['request_pengurus'] == 1) {
+        $umum = mysqli_fetch_assoc($result);
+        if ($umum['request_pengurus'] == 1) {
             $error = "Anda sudah memiliki permintaan yang sedang menunggu persetujuan admin.";
         } else {
             // Update request_pengurus menjadi 1
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             mysqli_stmt_close($update_stmt);
         }
     } else {
-        $error = "Data user tidak ditemukan.";
+        $error = "Data umum tidak ditemukan.";
     }
     mysqli_stmt_close($stmt);
 }

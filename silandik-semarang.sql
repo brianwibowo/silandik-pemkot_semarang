@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 23 Jun 2025 pada 02.07
+-- Waktu pembuatan: 28 Jun 2025 pada 06.02
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -24,20 +24,46 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `berita`
+--
+
+CREATE TABLE `berita` (
+  `id` int(11) NOT NULL,
+  `judul` varchar(255) NOT NULL,
+  `gambar` varchar(255) DEFAULT NULL,
+  `isi` text DEFAULT NULL,
+  `kategori` enum('dinas','sekolah') NOT NULL,
+  `penulis` varchar(100) DEFAULT 'Admin',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `views` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `berita`
+--
+
+INSERT INTO `berita` (`id`, `judul`, `gambar`, `isi`, `kategori`, `penulis`, `created_at`, `views`) VALUES
+(8, 'Berita Sekolah Pertama', '1751082775_685f671778934.png', 'berita pertama hari ini\r\nberita pertama hari ini\r\nberita pertama hari ini\r\nberita pertama hari ini', 'sekolah', 'Admin', '2025-06-28 10:52:55', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `dasar_hukum`
 --
 
 CREATE TABLE `dasar_hukum` (
   `id` int(11) NOT NULL,
-  `draft_hukum` varchar(250) NOT NULL DEFAULT current_timestamp()
+  `nomor_regulasi` varchar(255) NOT NULL,
+  `tentang` text NOT NULL,
+  `draft_hukum` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `dasar_hukum`
 --
 
-INSERT INTO `dasar_hukum` (`id`, `draft_hukum`) VALUES
-(1, 'SR Apriansyah Wibowo.pdf');
+INSERT INTO `dasar_hukum` (`id`, `nomor_regulasi`, `tentang`, `draft_hukum`) VALUES
+(1, '123', 'hukum 1', 'regulasi_685e83b9858d39.89427320.pdf');
 
 -- --------------------------------------------------------
 
@@ -55,17 +81,17 @@ CREATE TABLE `data_sekolah_inklusi` (
   `tanggal_berdiri` date DEFAULT NULL,
   `website` varchar(255) DEFAULT NULL,
   `logo_sekolah` varchar(255) DEFAULT NULL,
-  `deskripsi` text DEFAULT NULL
+  `deskripsi` text DEFAULT NULL,
+  `jenjang_sekolah` enum('SD','SMP','SMA','SMK') NOT NULL DEFAULT 'SD'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `data_sekolah_inklusi`
 --
 
-INSERT INTO `data_sekolah_inklusi` (`id`, `npsn`, `nama_sekolah`, `alamat`, `kepala_sekolah`, `telepon`, `tanggal_berdiri`, `website`, `logo_sekolah`, `deskripsi`) VALUES
-(10, '2', 'SMK BINUS', 'Alamat ini', 'WAWAN', '0814472558', '2025-06-23', 'https://github.com/', 'Acer_Wallpaper_02_5000x2813.jpg', 'ertyuio'),
-(11, '33', 'SMA 2 Semarang', 'Alamat itu', 'wanto', '0214587963', '1995-02-08', 'https://github.com/', 'sdn bandarharjo 3.jpg', 'aesrdftghjkj'),
-(12, '44', 'SMA 2 Semarang', 'alamat mana', 'wanto', '0214587963', '1980-11-12', 'https://github.com/', 'Screenshot 2025-06-23 050420.png', 'dfuytg');
+INSERT INTO `data_sekolah_inklusi` (`id`, `npsn`, `nama_sekolah`, `alamat`, `kepala_sekolah`, `telepon`, `tanggal_berdiri`, `website`, `logo_sekolah`, `deskripsi`, `jenjang_sekolah`) VALUES
+(19, '123', 'SD negeri 1', 'jl disini', 'kuman', '0808-1515-4848', '1986-07-27', 'https://github.com/', '1751012549_Screenshot 2025-06-18 161130.png', 'vagdsfhbgjnkfghjh', 'SD'),
+(20, '123', 'SMK 2 Semarang Kota', 'Jl. Lodan Raya No. 1, Kel. Bandarharjo, Kec. Semarang Utara, Kota Semarang, Provinsi Jawa Tengah.', 'awan', '0243563228', '2025-06-27', 'https://github.com/', '1751082816_logo_dinas.png', 'dfnsbdgndfosadpfmsgd', 'SMK');
 
 -- --------------------------------------------------------
 
@@ -75,20 +101,22 @@ INSERT INTO `data_sekolah_inklusi` (`id`, `npsn`, `nama_sekolah`, `alamat`, `kep
 
 CREATE TABLE `data_siswa` (
   `id` int(11) NOT NULL,
-  `nama` varchar(100) DEFAULT NULL,
-  `asal_sekolah` varchar(100) DEFAULT NULL,
-  `kelas` varchar(20) DEFAULT NULL,
-  `alamat` text DEFAULT NULL
+  `nisn` varchar(20) NOT NULL,
+  `nama_siswa` varchar(100) NOT NULL,
+  `jenis_kelamin` enum('L','P') NOT NULL,
+  `kelas` varchar(10) NOT NULL,
+  `sekolah_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `data_siswa`
 --
 
-INSERT INTO `data_siswa` (`id`, `nama`, `asal_sekolah`, `kelas`, `alamat`) VALUES
-(28, 'fizi dwi saputra', 'sd sekaran', '5', 'sekaran'),
-(29, 'asd', 'asf', 'f', 'asf'),
-(30, 'komeng', 'sekolah disini', 'kelas sekarang', 'ada');
+INSERT INTO `data_siswa` (`id`, `nisn`, `nama_siswa`, `jenis_kelamin`, `kelas`, `sekolah_id`) VALUES
+(1, '23131', 'Wawan', 'L', '5', 19),
+(2, '5445', 'siti', 'P', '6', 19),
+(4, '100012', 'Wawan', 'L', '1', 20),
+(5, '3456i', 'Anugrah Ridho Afriadi', 'L', '2', 20);
 
 -- --------------------------------------------------------
 
@@ -121,6 +149,14 @@ CREATE TABLE `galeri` (
   `judul` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data untuk tabel `galeri`
+--
+
+INSERT INTO `galeri` (`id`, `sekolah_id`, `path_gambar`, `judul`) VALUES
+(5, 19, '1751013097_Screenshot 2025-05-18 205239.png', 'gambar 1'),
+(6, 19, '1751018432_Screenshot 2025-05-31 024555.png', 'gambar 2');
+
 -- --------------------------------------------------------
 
 --
@@ -129,15 +165,21 @@ CREATE TABLE `galeri` (
 
 CREATE TABLE `info_sekolah_inklusi` (
   `id` int(11) NOT NULL,
-  `draft_sekolah` varchar(250) NOT NULL
+  `sekolah_id` int(11) DEFAULT NULL,
+  `nama_sekolah` varchar(255) NOT NULL,
+  `nama_kegiatan` varchar(255) NOT NULL,
+  `foto` varchar(255) DEFAULT NULL,
+  `tanggal` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `info_sekolah_inklusi`
 --
 
-INSERT INTO `info_sekolah_inklusi` (`id`, `draft_sekolah`) VALUES
-(1, 'Kota Salatiga_Penjelasan_Raperwali_Satu Data - pphukumsetda.pdf');
+INSERT INTO `info_sekolah_inklusi` (`id`, `sekolah_id`, `nama_sekolah`, `nama_kegiatan`, `foto`, `tanggal`, `created_at`) VALUES
+(6, 20, '', 'Kegiatan pertama', '685f6140f4073_1751081280.png', '2025-06-28', '2025-06-28 03:28:01'),
+(7, 19, '', 'Kegiatan pertama', '685f615253a39_1751081298.png', '2025-06-28', '2025-06-28 03:28:18');
 
 -- --------------------------------------------------------
 
@@ -152,6 +194,15 @@ CREATE TABLE `prasarana` (
   `jumlah` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data untuk tabel `prasarana`
+--
+
+INSERT INTO `prasarana` (`id`, `sekolah_id`, `jenis_prasarana`, `jumlah`) VALUES
+(17, 19, 'ruang kelas', 14),
+(18, 19, 'lab komputer', 2),
+(22, 20, 'ruang kelas', 20);
+
 -- --------------------------------------------------------
 
 --
@@ -162,9 +213,16 @@ CREATE TABLE `rekap` (
   `id` int(11) NOT NULL,
   `sekolah_id` int(11) NOT NULL,
   `jumlah_pegawai` int(11) NOT NULL,
-  `jumlah_siswa` int(11) NOT NULL,
   `jumlah_rombel` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `rekap`
+--
+
+INSERT INTO `rekap` (`id`, `sekolah_id`, `jumlah_pegawai`, `jumlah_rombel`) VALUES
+(4, 19, 30, 24),
+(5, 20, 39, 41);
 
 -- --------------------------------------------------------
 
@@ -176,21 +234,30 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` enum('admin','umum') NOT NULL DEFAULT 'umum',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `role` enum('admin','umum','pengurus') NOT NULL DEFAULT 'umum',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `request_pengurus` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `role`, `created_at`) VALUES
-(1, 'nizar@gmail.com', '1234567890', 'admin', '2025-04-21 07:04:26'),
-(2, 'silandik@gmail.com', 'silandiksemarang123', 'admin', '2025-04-21 11:37:02');
+INSERT INTO `users` (`id`, `email`, `password`, `role`, `created_at`, `request_pengurus`) VALUES
+(1, 'nizar@gmail.com', '1234567890', 'admin', '2025-04-21 07:04:26', 0),
+(2, 'silandik@gmail.com', 'silandiksemarang123', 'admin', '2025-04-21 11:37:02', 0),
+(6, 'akunpengurus@gmail.com', '$2y$10$PWPGQgg.EmY0GeRBa0iT2epvyiREp61zux1z4PwpzaOrkopPe1Hbq', 'pengurus', '2025-06-27 23:45:46', 0),
+(7, 'akunbaru@gmail.com', '$2y$10$OwB3CgSZ0FSxrCJeG4PgW.lcgTfUB7.AiwwBIEpV4cK2GIxrlaZSW', '', '2025-06-27 23:48:43', 0);
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indeks untuk tabel `berita`
+--
+ALTER TABLE `berita`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indeks untuk tabel `dasar_hukum`
@@ -208,7 +275,9 @@ ALTER TABLE `data_sekolah_inklusi`
 -- Indeks untuk tabel `data_siswa`
 --
 ALTER TABLE `data_siswa`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nisn` (`nisn`),
+  ADD KEY `sekolah_id` (`sekolah_id`);
 
 --
 -- Indeks untuk tabel `dokumen_kurikulum_inklusi`
@@ -227,7 +296,8 @@ ALTER TABLE `galeri`
 -- Indeks untuk tabel `info_sekolah_inklusi`
 --
 ALTER TABLE `info_sekolah_inklusi`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_sekolah` (`sekolah_id`);
 
 --
 -- Indeks untuk tabel `prasarana`
@@ -255,50 +325,80 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT untuk tabel `berita`
+--
+ALTER TABLE `berita`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT untuk tabel `dasar_hukum`
+--
+ALTER TABLE `dasar_hukum`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT untuk tabel `data_sekolah_inklusi`
 --
 ALTER TABLE `data_sekolah_inklusi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT untuk tabel `data_siswa`
 --
 ALTER TABLE `data_siswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `galeri`
 --
 ALTER TABLE `galeri`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT untuk tabel `info_sekolah_inklusi`
+--
+ALTER TABLE `info_sekolah_inklusi`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT untuk tabel `prasarana`
 --
 ALTER TABLE `prasarana`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT untuk tabel `rekap`
 --
 ALTER TABLE `rekap`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
 --
 
 --
+-- Ketidakleluasaan untuk tabel `data_siswa`
+--
+ALTER TABLE `data_siswa`
+  ADD CONSTRAINT `data_siswa_ibfk_1` FOREIGN KEY (`sekolah_id`) REFERENCES `data_sekolah_inklusi` (`id`);
+
+--
 -- Ketidakleluasaan untuk tabel `galeri`
 --
 ALTER TABLE `galeri`
   ADD CONSTRAINT `galeri_ibfk_1` FOREIGN KEY (`sekolah_id`) REFERENCES `data_sekolah_inklusi` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `info_sekolah_inklusi`
+--
+ALTER TABLE `info_sekolah_inklusi`
+  ADD CONSTRAINT `fk_sekolah` FOREIGN KEY (`sekolah_id`) REFERENCES `data_sekolah_inklusi` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ketidakleluasaan untuk tabel `prasarana`

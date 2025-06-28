@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
     $password2 = $_POST['password2'];
-    $role = 'user'; // default role
+    $role = 'umum'; // default role
     $request_pengurus = isset($_POST['request_pengurus']) ? 1 : 0;
 
     // Validasi
