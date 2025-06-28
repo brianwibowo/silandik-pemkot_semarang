@@ -11,7 +11,7 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
 
     <!-- Header Section -->
     <div class="header-section">
-        <div class="container-fluid px-4">
+        <div class="header-container">
             <div class="header-title">
                 <h1 class="page-title">Data Sekolah Inklusi</h1>
                 <p class="page-subtitle">Kelola informasi sekolah inklusi dengan mudah</p>
@@ -297,8 +297,6 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
         });
     }, 5000);
 </script>
-
-
 
 <?php include '../partials/footer.php'; ?>
 
