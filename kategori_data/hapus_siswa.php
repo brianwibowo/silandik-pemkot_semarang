@@ -1,16 +1,18 @@
 <?php
 session_start();
 include '../config.php';
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+// Pengurus juga boleh akses hapus
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
     header("Location: index.php");
     exit;
 }
 include '../koneksi.php';
 ?>
+
 <?php
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id = (int)$_GET['id'];
     
     $query = "DELETE FROM data_siswa WHERE id = $id";
     

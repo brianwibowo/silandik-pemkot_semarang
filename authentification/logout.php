@@ -1,7 +1,16 @@
 <?php
 session_start();
-$_SESSION['role'] = 'umum'; // Ganti role ke umum
-$_SESSION['logout_success'] = true; // Tambah flag untuk alert
-header("Location: ../index.php");
+
+// Hapus semua data session
+session_unset();
+
+// Hancurkan session
+session_destroy();
+
+// Regenerate session ID untuk keamanan ekstra
+session_regenerate_id(true);
+
+// Redirect ke login dengan pesan sukses
+header("Location: login.php?logout=success");
 exit;
 ?>

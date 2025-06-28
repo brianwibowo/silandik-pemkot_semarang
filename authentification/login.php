@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8" />
     <title>Login - Silandik</title>
@@ -44,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="row justify-content-center">
             <div class="col-lg-5">
                 <div class="text-center mb-3">
-                    <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="60" height="40"> 
+                    <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="60" height="40">
                 </div>
                 <div class="card shadow-lg">
                     <div class="card-header bg-primary text-white text-center">
@@ -69,8 +70,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
                         </form>
                     </div>
+
                     <div class="card-footer text-center py-3">
-                        <small>Ingin mendaftar menjadi Admin? Hubungi operator Anda!</small>
+                        <small>Belum punya akun? <a href="register.php">Daftar di sini</a></small>
                     </div>
                 </div>
             </div>
@@ -79,33 +81,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <script>
         // Toggle password visibility
-        document.getElementById('showPassword').addEventListener('change', function () {
+        document.getElementById('showPassword').addEventListener('change', function() {
             const passwordInput = document.getElementById('inputPassword');
             passwordInput.type = this.checked ? 'text' : 'password';
         });
 
         // Alert gagal
         <?php if (!empty($error)): ?>
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Gagal',
-            text: '<?php echo $error; ?>',
-            confirmButtonColor: '#198754'
-        });
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Gagal',
+                text: '<?php echo $error; ?>',
+                confirmButtonColor: '#198754'
+            });
         <?php endif; ?>
 
         // Alert sukses + redirect
         <?php if ($showSuccess): ?>
-        Swal.fire({
-            icon: 'success',
-            title: 'Login Berhasil!',
-            text: 'Selamat datang kembali!',
-            confirmButtonColor: '#198754',
-            confirmButtonText: 'OK'
-        }).then(() => {
-            window.location.href = "../index.php";
-        });
+            Swal.fire({
+                icon: 'success',
+                title: 'Login Berhasil!',
+                text: 'Selamat datang kembali!',
+                confirmButtonColor: '#198754',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = "../index.php";
+            });
         <?php endif; ?>
     </script>
 </body>
+
 </html>
