@@ -1,8 +1,8 @@
 <?php
 session_start();
-include '/kerjaan/config.php';
-include '/kerjaan/partials/head.php';
-include '/kerjaan/koneksi.php';
+include '../config.php';
+include '../partials/head.php';
+include '../koneksi.php';
 
 // Akses khusus admin atau pengurus
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {

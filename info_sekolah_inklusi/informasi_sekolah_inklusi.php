@@ -1,7 +1,7 @@
 <?php
 session_start();
-include '/kerjaan/config.php';
-include '/kerjaan/koneksi.php';
+include '../config.php';
+include '../koneksi.php';
 
 $isAdmin = isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus']);
 

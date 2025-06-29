@@ -2,6 +2,15 @@
 session_start();
 include 'koneksi.php';
 include 'partials/head.php';
+
+// Ambil 4 kegiatan terbaru dari info_sekolah_inklusi
+$qKegiatan = mysqli_query($conn, "
+    SELECT info.*, sekolah.nama_sekolah 
+    FROM info_sekolah_inklusi AS info
+    LEFT JOIN data_sekolah_inklusi AS sekolah ON info.sekolah_id = sekolah.id
+    ORDER BY info.tanggal DESC
+    LIMIT 4
+");
 ?>
 <div id="background">
     <?php include 'sidebar.php'; ?>
@@ -183,6 +192,44 @@ include 'partials/head.php';
                         <div class="empty-state">
                             <i class="fas fa-newspaper empty-icon"></i>
                             <p>Belum ada berita dinas</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Kegiatan Sekolah Inklusi Section -->
+            <div class="news-section" id="kegiatanSekolahSection">
+                <div class="section-header">
+                    <div class="section-icon-title">
+                        <i class="fas fa-calendar-alt section-icon"></i>
+                        <h2 class="section-title">Kegiatan Sekolah Inklusi</h2>
+                    </div>
+                </div>
+                <div class="news-grid">
+                    <?php
+                    $adaKegiatan = false;
+                    while ($k = mysqli_fetch_assoc($qKegiatan)): $adaKegiatan = true; ?>
+                        <div class="news-card">
+                            <?php if (!empty($k['foto']) && file_exists("uploads/" . $k['foto'])): ?>
+                                <img src="uploads/<?= htmlspecialchars($k['foto']) ?>" class="news-image" alt="<?= htmlspecialchars($k['nama_kegiatan']) ?>" style="height:200px;object-fit:cover;">
+                            <?php else: ?>
+                                <div class="news-image-placeholder" style="height:200px;">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            <?php endif; ?>
+                            <div class="news-content">
+                                <div class="news-meta">
+                                    <span class="news-date"><?= date('d M Y', strtotime($k['tanggal'])) ?></span>
+                                    <span class="news-category"><?= htmlspecialchars($k['nama_sekolah']) ?></span>
+                                </div>
+                                <h3 class="news-title"><?= htmlspecialchars($k['nama_kegiatan']) ?></h3>
+                            </div>
+                        </div>
+                    <?php endwhile;
+                    if (!$adaKegiatan): ?>
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-alt empty-icon"></i>
+                            <p>Belum ada kegiatan sekolah inklusi</p>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -633,8 +680,6 @@ include 'partials/head.php';
         }
     }
 </style>
-
 <?php include 'partials/footer.php'; ?>
 </body>
-
 </html>
