@@ -41,6 +41,23 @@ include '../koneksi.php';
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-2">
+                            <div class="filter-section">
+                                <select class="filter-select" id="kelasFilter">
+                                    <option value="">Semua Kelas</option>
+                                    <!-- Isi akan dinamis tergantung jenjang -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="filter-section">
+                                <select class="filter-select" id="jkFilter">
+                                    <option value="">Semua JK</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -110,6 +127,9 @@ include '../koneksi.php';
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>
+                                        <tr id="noResults" class="d-none">
+                                            <td colspan="8" class="text-center text-danger">Tidak ada data ditemukan.</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             <?php else: ?>
@@ -157,48 +177,38 @@ include '../koneksi.php';
 </body>
 
 <script>
-    // Search untuk tabel
-    document.getElementById('searchInput').addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        // Pilih semua baris pada tbody dari semua tabel
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const jenjangValue = document.getElementById('jenjangFilter').value;
+        const kelasValue = document.getElementById('kelasFilter').value;
+        const jkValue = document.getElementById('jkFilter').value;
+
         const rows = document.querySelectorAll('table tbody tr');
         let visibleCount = 0;
 
         rows.forEach(row => {
+            if (row.id === 'noResults') return;
+
             const rowText = row.textContent.toLowerCase();
-            if (rowText.includes(searchTerm)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        // Show/hide no results message jika ada
-        const noResults = document.getElementById('noResults');
-        if (noResults) {
-            if (visibleCount === 0 && searchTerm !== '') {
-                noResults.classList.remove('d-none');
-            } else {
-                noResults.classList.add('d-none');
-            }
-        }
-    });
-
-    document.getElementById('jenjangFilter').addEventListener('change', function() {
-        const filterValue = this.value;
-        const rows = document.querySelectorAll('table tbody tr');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            // Cari badge jenjang di kolom "Asal Sekolah" (td ke-5)
             const asalSekolahCell = row.cells[4];
+            const kelasCell = row.cells[5];
+            const jkCell = row.cells[3];
+
             let jenjang = '';
             if (asalSekolahCell) {
                 const badge = asalSekolahCell.querySelector('span.badge.bg-secondary');
                 jenjang = badge ? badge.textContent.trim() : '';
             }
-            if (filterValue === '' || jenjang === filterValue) {
+
+            const kelas = kelasCell ? kelasCell.textContent.trim() : '';
+            const jkBadge = jkCell ? jkCell.textContent.trim() : '';
+
+            const matchesSearch = rowText.includes(searchTerm);
+            const matchesJenjang = jenjangValue === '' || jenjang === jenjangValue;
+            const matchesKelas = kelasValue === '' || kelas.toLowerCase().includes(kelasValue.toLowerCase());
+            const matchesJK = jkValue === '' || jkBadge === jkValue;
+
+            if (matchesSearch && matchesJenjang && matchesKelas && matchesJK) {
                 row.style.display = '';
                 visibleCount++;
             } else {
@@ -206,19 +216,44 @@ include '../koneksi.php';
             }
         });
 
-        // Show/hide no results message jika ada
         const noResults = document.getElementById('noResults');
         if (noResults) {
-            if (visibleCount === 0 && filterValue !== '') {
+            if (visibleCount === 0) {
                 noResults.classList.remove('d-none');
             } else {
                 noResults.classList.add('d-none');
             }
         }
+    }
+
+    // Event listeners untuk semua filter
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('jenjangFilter').addEventListener('change', function () {
+        updateKelasOptions(this.value);
+        applyFilters();
     });
+    document.getElementById('kelasFilter').addEventListener('change', applyFilters);
+    document.getElementById('jkFilter').addEventListener('change', applyFilters);
+
+    // Fungsi untuk memperbarui isi dropdown kelas secara dinamis berdasarkan jenjang
+    function updateKelasOptions(jenjang) {
+        const kelasFilter = document.getElementById('kelasFilter');
+        kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
+
+        let maxKelas = 0;
+        if (jenjang === 'SD') maxKelas = 6;
+        else if (['SMP', 'SMA', 'SMK'].includes(jenjang)) maxKelas = 3;
+
+        for (let i = 1; i <= maxKelas; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Kelas ${i}`;
+            kelasFilter.appendChild(option);
+        }
+    }
 
     // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
+    setTimeout(function () {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
             if (alert.classList.contains('show')) {
@@ -228,5 +263,6 @@ include '../koneksi.php';
         });
     }, 5000);
 </script>
+
 
 </html>
