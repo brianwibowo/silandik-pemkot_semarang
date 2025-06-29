@@ -65,12 +65,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <input class="form-check-input" id="showPassword" type="checkbox" />
                                 <label class="form-check-label" for="showPassword">Show Password</label>
                             </div>
-                            <div class="d-flex justify-content-center">
+                            <div class="d-flex justify-content-center mb-2">
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </div>
                         </form>
+                        <div class="d-flex justify-content-center">
+                            <a href="../index.php" class="btn btn-outline-secondary mt-2">
+                                <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                            </a>
+                        </div>
                     </div>
-
                     <div class="card-footer text-center py-3">
                         <small>Belum punya akun? <a href="register.php">Daftar di sini</a></small>
                     </div>
