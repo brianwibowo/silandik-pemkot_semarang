@@ -94,12 +94,10 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-
         body {
             background-color: #f8f9fa;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-
         .school-profile-card {
             background: white;
             border-radius: 15px;
@@ -107,7 +105,6 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             overflow: hidden;
             margin-bottom: 20px;
         }
-
         .school-logo {
             width: 120px;
             height: 120px;
@@ -116,14 +113,12 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             border: 3px solid #fff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-
         .school-name {
             color: #4285f4;
             font-size: 1.8rem;
             font-weight: 600;
             margin: 15px 0 10px 0;
         }
-
         .school-type-badge {
             background: #34a853;
             color: white;
@@ -133,7 +128,6 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             display: inline-block;
             margin: 10px 0;
         }
-
         .section-card {
             background: white;
             border-radius: 15px;
@@ -141,7 +135,6 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             overflow: hidden;
             margin-bottom: 20px;
         }
-
         .section-header {
             background: #4285f4;
             color: white;
@@ -151,39 +144,32 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             align-items: center;
             justify-content: space-between;
         }
-
         .section-header i {
             margin-right: 10px;
         }
-
         .info-item {
             padding: 12px 0;
             border-bottom: 1px solid #f0f0f0;
             display: flex;
             align-items: center;
         }
-
         .info-item:last-child {
             border-bottom: none;
         }
-
         .info-item i {
             width: 20px;
             margin-right: 12px;
             color: #4285f4;
         }
-
         .info-label {
             font-size: 0.85rem;
             color: #666;
             display: block;
         }
-
         .info-value {
             color: #333;
             font-weight: 500;
         }
-
         .stat-card {
             background: white;
             border-radius: 12px;
@@ -193,11 +179,9 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             transition: transform 0.3s ease;
             height: 100%;
         }
-
         .stat-card:hover {
             transform: translateY(-2px);
         }
-
         .stat-icon {
             width: 60px;
             height: 60px;
@@ -208,18 +192,15 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             margin: 0 auto 15px auto;
             font-size: 1.5rem;
         }
-
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 5px;
         }
-
         .stat-label {
             color: #666;
             font-size: 0.9rem;
         }
-
         .prasarana-item {
             background: #f8f9fa;
             border-radius: 8px;
@@ -230,7 +211,6 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             align-items: center;
             border-left: 4px solid #34a853;
         }
-
         .prasarana-count {
             background: #34a853;
             color: white;
@@ -238,7 +218,6 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             border-radius: 20px;
             font-weight: 600;
         }
-
         .total-prasarana {
             background: linear-gradient(135deg, #34a853, #0f9d58);
             color: white;
@@ -247,16 +226,13 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             text-align: center;
             margin-top: 20px;
         }
-
         .students-table {
             margin-top: 30px;
         }
-
         .table-header {
             background: #4285f4;
             color: white;
         }
-
         .gender-badge {
             width: 30px;
             height: 30px;
@@ -267,15 +243,12 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             font-weight: 600;
             color: white;
         }
-
         .male {
             background: #4285f4;
         }
-
         .female {
             background: #ea4335;
         }
-
         .edit-btn {
             background: #fbbc04;
             border: none;
@@ -285,12 +258,10 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             font-size: 0.9rem;
             transition: all 0.3s ease;
         }
-
         .edit-btn:hover {
             background: #f9ab00;
             transform: translateY(-1px);
         }
-
         .back-btn {
             background: #6c757d;
             color: white;
@@ -302,14 +273,12 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             transition: all 0.3s ease;
             font-size: small;
         }
-
         .back-btn:hover {
             background: #5a6268;
             color: white;
             text-decoration: none;
             transform: translateY(-1px);
         }
-
         .description-card {
             background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
             border: 1px solid #e3f2fd;
@@ -501,8 +470,11 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                 <?php if ($isAdminOrPengurus): ?>
                 <div class="students-table">
                     <div class="section-card">
-                        <div class="section-header">
+                        <div class="section-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-users"></i>Data Siswa</span>
+                            <a href="export_siswa_excel.php?id=<?= $sekolah['id'] ?>" class="btn btn-success btn-sm">
+                                <i class="fas fa-download"></i> Download Excel
+                            </a>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
@@ -513,11 +485,13 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                                         <th>Nama</th>
                                         <th style="width: 80px;">JK</th>
                                         <th style="width: 80px;">Kelas</th>
+                                        <th style="width: 140px;">Jenis Inklusi</th>
                                         <th style="width: 100px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php $no = 1;
+                                    mysqli_data_seek($siswa, 0);
                                     while ($row = mysqli_fetch_assoc($siswa)): ?>
                                         <tr>
                                             <td class="text-center"><?= $no++; ?></td>
@@ -533,6 +507,7 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center"><?= sanitizeOutput($row['kelas']); ?></td>
+                                            <td class="text-center"><?= sanitizeOutput($row['jenis_inklusi']); ?></td>
                                             <td class="text-center">
                                                 <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('Hapus siswa ini?')"><i class="fas fa-trash"></i></a>
