@@ -48,7 +48,7 @@ if (isset($_GET['action'], $_GET['id'])) {
             
         } elseif ($action === 'change_role' && isset($_GET['new_role'])) {
             $new_role = $_GET['new_role'];
-            if (in_array($new_role, ['user', 'pengurus', 'admin'])) {
+            if (in_array($new_role, ['umum', 'pengurus', 'admin'])) {
                 $stmt = mysqli_prepare($conn, "UPDATE users SET role=?, request_pengurus=0 WHERE id=?");
                 mysqli_stmt_bind_param($stmt, "si", $new_role, $id);
                 
@@ -160,7 +160,16 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                             <?= htmlspecialchars($row['email']) ?>
                                         </td>
                                         <td>
-                                            <span class="badge bg-primary"><?= htmlspecialchars(ucfirst($row['role'])) ?></span>
+                                            <?php 
+                                            $current_role_color = '';
+                                            switch($row['role']) {
+                                                case 'admin': $current_role_color = 'bg-danger'; break;
+                                                case 'pengurus': $current_role_color = 'bg-warning'; break;
+                                                case 'umum': $current_role_color = 'bg-primary'; break;
+                                                default: $current_role_color = 'bg-secondary';
+                                            }
+                                            ?>
+                                            <span class="badge <?= $current_role_color ?>"><?= htmlspecialchars(ucfirst($row['role'])) ?></span>
                                         </td>
                                         <td class="text-muted small">
                                             <?= isset($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : 'N/A' ?>
@@ -225,7 +234,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                             switch($row['role']) {
                                                 case 'admin': $role_color = 'bg-danger'; break;
                                                 case 'pengurus': $role_color = 'bg-warning'; break;
-                                                case 'user': $role_color = 'bg-primary'; break;
+                                                case 'umum': $role_color = 'bg-primary'; break;
                                                 default: $role_color = 'bg-secondary';
                                             }
                                             ?>
@@ -248,9 +257,9 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                                     <i class="fas fa-user-edit"></i> Ubah Role
                                                 </button>
                                                 <ul class="dropdown-menu">
-                                                    <?php if ($row['role'] !== 'user'): ?>
-                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'user', '<?= htmlspecialchars($row['email']) ?>')">
-                                                        <i class="fas fa-user text-primary"></i> User
+                                                    <?php if ($row['role'] !== 'umum'): ?>
+                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'umum', '<?= htmlspecialchars($row['email']) ?>')">
+                                                        <i class="fas fa-user text-primary"></i> Umum
                                                     </a></li>
                                                     <?php endif; ?>
                                                     
@@ -319,7 +328,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
 
         // Fungsi untuk mengubah role user
         function changeRole(id, newRole, email) {
-            const roleText = newRole === 'admin' ? 'Admin' : (newRole === 'pengurus' ? 'Pengurus' : 'User');
+            const roleText = newRole === 'admin' ? 'Admin' : (newRole === 'pengurus' ? 'Pengurus' : 'Umum');
             
             Swal.fire({
                 title: 'Ubah Role User',

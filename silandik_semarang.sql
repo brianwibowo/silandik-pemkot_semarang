@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 28 Jun 2025 pada 06.02
+-- Waktu pembuatan: 29 Jun 2025 pada 17.28
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `silandik-semarang`
+-- Database: `silandik_semarang`
 --
 
 -- --------------------------------------------------------
@@ -105,6 +105,7 @@ CREATE TABLE `data_siswa` (
   `nama_siswa` varchar(100) NOT NULL,
   `jenis_kelamin` enum('L','P') NOT NULL,
   `kelas` varchar(10) NOT NULL,
+  `jenis_inklusi` varchar(255) NOT NULL,
   `sekolah_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -112,11 +113,11 @@ CREATE TABLE `data_siswa` (
 -- Dumping data untuk tabel `data_siswa`
 --
 
-INSERT INTO `data_siswa` (`id`, `nisn`, `nama_siswa`, `jenis_kelamin`, `kelas`, `sekolah_id`) VALUES
-(1, '23131', 'Wawan', 'L', '5', 19),
-(2, '5445', 'siti', 'P', '6', 19),
-(4, '100012', 'Wawan', 'L', '1', 20),
-(5, '3456i', 'Anugrah Ridho Afriadi', 'L', '2', 20);
+INSERT INTO `data_siswa` (`id`, `nisn`, `nama_siswa`, `jenis_kelamin`, `kelas`, `jenis_inklusi`, `sekolah_id`) VALUES
+(1, '23131', 'Wawan', 'L', '5', 'jenis 1', 19),
+(2, '5445', 'siti', 'P', '6', '', 19),
+(4, '100012', 'Wawan', 'L', '1', '', 20),
+(5, '3456i', 'Anugrah Ridho Afriadi', 'L', '2', 'jenis 1', 20);
 
 -- --------------------------------------------------------
 
@@ -178,8 +179,7 @@ CREATE TABLE `info_sekolah_inklusi` (
 --
 
 INSERT INTO `info_sekolah_inklusi` (`id`, `sekolah_id`, `nama_sekolah`, `nama_kegiatan`, `foto`, `tanggal`, `created_at`) VALUES
-(6, 20, '', 'Kegiatan pertama', '685f6140f4073_1751081280.png', '2025-06-28', '2025-06-28 03:28:01'),
-(7, 19, '', 'Kegiatan pertama', '685f615253a39_1751081298.png', '2025-06-28', '2025-06-28 03:28:18');
+(8, 20, '', 'kegiatan pertama', '686154079ccfa_1751208967.png', '2025-06-29', '2025-06-29 14:56:07');
 
 -- --------------------------------------------------------
 
@@ -247,7 +247,7 @@ INSERT INTO `users` (`id`, `email`, `password`, `role`, `created_at`, `request_p
 (1, 'nizar@gmail.com', '1234567890', 'admin', '2025-04-21 07:04:26', 0),
 (2, 'silandik@gmail.com', 'silandiksemarang123', 'admin', '2025-04-21 11:37:02', 0),
 (6, 'akunpengurus@gmail.com', '$2y$10$PWPGQgg.EmY0GeRBa0iT2epvyiREp61zux1z4PwpzaOrkopPe1Hbq', 'pengurus', '2025-06-27 23:45:46', 0),
-(7, 'akunbaru@gmail.com', '$2y$10$OwB3CgSZ0FSxrCJeG4PgW.lcgTfUB7.AiwwBIEpV4cK2GIxrlaZSW', '', '2025-06-27 23:48:43', 0);
+(8, 'akunbaru@gmail.com', '$2y$10$qGjC9paUd4vsnpgYYpHs7On6r0eQM0WYEqgkAhZG20grFaWovWKF6', '', '2025-06-29 15:18:46', 0);
 
 --
 -- Indexes for dumped tables
@@ -358,7 +358,7 @@ ALTER TABLE `galeri`
 -- AUTO_INCREMENT untuk tabel `info_sekolah_inklusi`
 --
 ALTER TABLE `info_sekolah_inklusi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT untuk tabel `prasarana`
@@ -376,7 +376,7 @@ ALTER TABLE `rekap`
 -- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
