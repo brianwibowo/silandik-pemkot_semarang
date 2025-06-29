@@ -45,7 +45,6 @@ include '../koneksi.php';
                             <div class="filter-section">
                                 <select class="filter-select" id="kelasFilter">
                                     <option value="">Semua Kelas</option>
-                                    <!-- Isi akan dinamis tergantung jenjang -->
                                 </select>
                             </div>
                         </div>
@@ -55,6 +54,17 @@ include '../koneksi.php';
                                     <option value="">Semua JK</option>
                                     <option value="L">Laki-laki</option>
                                     <option value="P">Perempuan</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="filter-section">
+                                <select class="filter-select" id="inklusiFilter">
+                                    <option value="">Semua Inklusi</option>
+                                    <option value="Tunanetra">Tunanetra</option>
+                                    <option value="Tunarungu">Tunarungu</option>
+                                    <option value="Tunadaksa">Tunadaksa</option>
+                                    <option value="Autis">Autis</option>
                                 </select>
                             </div>
                         </div>
@@ -85,6 +95,7 @@ include '../koneksi.php';
                                             <th style="width:60px;">JK</th>
                                             <th>Asal Sekolah</th>
                                             <th style="width:80px;">Kelas</th>
+                                            <th style="width:120px;">Jenis Inklusi</th>
                                             <th>Alamat Sekolah</th>
                                             <th style="width:90px;">Aksi</th>
                                         </tr>
@@ -93,9 +104,9 @@ include '../koneksi.php';
                                         <?php
                                         $no = 1;
                                         $query = mysqli_query($conn, "SELECT s.*, ds.nama_sekolah, ds.alamat, ds.jenjang_sekolah 
-                                        FROM data_siswa s 
-                                        LEFT JOIN data_sekolah_inklusi ds ON s.sekolah_id = ds.id
-                                        ORDER BY s.id DESC");
+                                            FROM data_siswa s 
+                                            LEFT JOIN data_sekolah_inklusi ds ON s.sekolah_id = ds.id
+                                            ORDER BY s.id DESC");
                                         while ($row = mysqli_fetch_assoc($query)) :
                                         ?>
                                             <tr>
@@ -116,6 +127,7 @@ include '../koneksi.php';
                                                     <span class="badge bg-secondary ms-1"><?= htmlspecialchars($row['jenjang_sekolah']); ?></span>
                                                 </td>
                                                 <td class="text-center"><?= htmlspecialchars($row['kelas']); ?></td>
+                                                <td class="text-center"><?= htmlspecialchars($row['jenis_inklusi']); ?></td>
                                                 <td><?= htmlspecialchars($row['alamat']); ?></td>
                                                 <td class="text-center">
                                                     <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" title="Edit">
@@ -128,7 +140,7 @@ include '../koneksi.php';
                                             </tr>
                                         <?php endwhile; ?>
                                         <tr id="noResults" class="d-none">
-                                            <td colspan="8" class="text-center text-danger">Tidak ada data ditemukan.</td>
+                                            <td colspan="9" class="text-center text-danger">Tidak ada data ditemukan.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -177,92 +189,92 @@ include '../koneksi.php';
 </body>
 
 <script>
-    function applyFilters() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const jenjangValue = document.getElementById('jenjangFilter').value;
-        const kelasValue = document.getElementById('kelasFilter').value;
-        const jkValue = document.getElementById('jkFilter').value;
+function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const jenjangValue = document.getElementById('jenjangFilter').value;
+    const kelasValue = document.getElementById('kelasFilter').value;
+    const jkValue = document.getElementById('jkFilter').value;
+    const inklusiValue = document.getElementById('inklusiFilter').value.toLowerCase();
 
-        const rows = document.querySelectorAll('table tbody tr');
-        let visibleCount = 0;
+    const rows = document.querySelectorAll('table tbody tr');
+    let visibleCount = 0;
 
-        rows.forEach(row => {
-            if (row.id === 'noResults') return;
+    rows.forEach(row => {
+        if (row.id === 'noResults') return;
 
-            const rowText = row.textContent.toLowerCase();
-            const asalSekolahCell = row.cells[4];
-            const kelasCell = row.cells[5];
-            const jkCell = row.cells[3];
+        const rowText = row.textContent.toLowerCase();
+        const asalSekolahCell = row.cells[4];
+        const kelasCell = row.cells[5];
+        const inklusiCell = row.cells[6];
+        const jkCell = row.cells[3];
 
-            let jenjang = '';
-            if (asalSekolahCell) {
-                const badge = asalSekolahCell.querySelector('span.badge.bg-secondary');
-                jenjang = badge ? badge.textContent.trim() : '';
-            }
-
-            const kelas = kelasCell ? kelasCell.textContent.trim() : '';
-            const jkBadge = jkCell ? jkCell.textContent.trim() : '';
-
-            const matchesSearch = rowText.includes(searchTerm);
-            const matchesJenjang = jenjangValue === '' || jenjang === jenjangValue;
-            const matchesKelas = kelasValue === '' || kelas.toLowerCase().includes(kelasValue.toLowerCase());
-            const matchesJK = jkValue === '' || jkBadge === jkValue;
-
-            if (matchesSearch && matchesJenjang && matchesKelas && matchesJK) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        const noResults = document.getElementById('noResults');
-        if (noResults) {
-            if (visibleCount === 0) {
-                noResults.classList.remove('d-none');
-            } else {
-                noResults.classList.add('d-none');
-            }
+        let jenjang = '';
+        if (asalSekolahCell) {
+            const badge = asalSekolahCell.querySelector('span.badge.bg-secondary');
+            jenjang = badge ? badge.textContent.trim() : '';
         }
-    }
 
-    // Event listeners untuk semua filter
-    document.getElementById('searchInput').addEventListener('input', applyFilters);
-    document.getElementById('jenjangFilter').addEventListener('change', function () {
-        updateKelasOptions(this.value);
-        applyFilters();
+        const kelas = kelasCell ? kelasCell.textContent.trim() : '';
+        const jenisInklusi = inklusiCell ? inklusiCell.textContent.trim().toLowerCase() : '';
+        const jkBadge = jkCell ? jkCell.textContent.trim() : '';
+
+        const matchesSearch = rowText.includes(searchTerm);
+        const matchesJenjang = jenjangValue === '' || jenjang === jenjangValue;
+        const matchesKelas = kelasValue === '' || kelas.toLowerCase().includes(kelasValue.toLowerCase());
+        const matchesJK = jkValue === '' || jkBadge === jkValue;
+        const matchesInklusi = inklusiValue === '' || jenisInklusi.includes(inklusiValue);
+
+        if (matchesSearch && matchesJenjang && matchesKelas && matchesJK && matchesInklusi) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
     });
-    document.getElementById('kelasFilter').addEventListener('change', applyFilters);
-    document.getElementById('jkFilter').addEventListener('change', applyFilters);
 
-    // Fungsi untuk memperbarui isi dropdown kelas secara dinamis berdasarkan jenjang
-    function updateKelasOptions(jenjang) {
-        const kelasFilter = document.getElementById('kelasFilter');
-        kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
-
-        let maxKelas = 0;
-        if (jenjang === 'SD') maxKelas = 6;
-        else if (['SMP', 'SMA', 'SMK'].includes(jenjang)) maxKelas = 3;
-
-        for (let i = 1; i <= maxKelas; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = `Kelas ${i}`;
-            kelasFilter.appendChild(option);
+    const noResults = document.getElementById('noResults');
+    if (noResults) {
+        if (visibleCount === 0) {
+            noResults.classList.remove('d-none');
+        } else {
+            noResults.classList.add('d-none');
         }
     }
+}
 
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function () {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            if (alert.classList.contains('show')) {
-                alert.classList.remove('show');
-                alert.classList.add('fade');
-            }
-        });
-    }, 5000);
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('jenjangFilter').addEventListener('change', function () {
+    updateKelasOptions(this.value);
+    applyFilters();
+});
+document.getElementById('kelasFilter').addEventListener('change', applyFilters);
+document.getElementById('jkFilter').addEventListener('change', applyFilters);
+document.getElementById('inklusiFilter').addEventListener('change', applyFilters);
+
+function updateKelasOptions(jenjang) {
+    const kelasFilter = document.getElementById('kelasFilter');
+    kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
+
+    let maxKelas = 0;
+    if (jenjang === 'SD') maxKelas = 6;
+    else if (['SMP', 'SMA', 'SMK'].includes(jenjang)) maxKelas = 3;
+
+    for (let i = 1; i <= maxKelas; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Kelas ${i}`;
+        kelasFilter.appendChild(option);
+    }
+}
+
+setTimeout(function () {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        if (alert.classList.contains('show')) {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+        }
+    });
+}, 5000);
 </script>
-
-
 </html>

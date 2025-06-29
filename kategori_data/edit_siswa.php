@@ -42,36 +42,39 @@ include '../koneksi.php';
                             $jenis_kelamin = $_POST['jenis_kelamin'];
                             $sekolah_id = (int)$_POST['sekolah_id'];
                             $kelas = trim($_POST['kelas']);
+                            $jenis_inklusi = trim($_POST['jenis_inklusi']);
 
                             if ($nama && $kelas && in_array($jenis_kelamin, ['L', 'P']) && $sekolah_id > 0) {
-                                mysqli_query($conn, "UPDATE data_siswa SET 
-                                    nisn='$nisn',
-                                    nama_siswa='$nama',
-                                    jenis_kelamin='$jenis_kelamin',
-                                    sekolah_id=$sekolah_id,
-                                    kelas='$kelas'
-                                    WHERE id=$id
+                                // Gunakan prepared statement untuk keamanan
+                                $stmt = $conn->prepare("UPDATE data_siswa SET 
+                                    nisn=?, nama_siswa=?, jenis_kelamin=?, sekolah_id=?, kelas=?, jenis_inklusi=?
+                                    WHERE id=?
                                 ");
-                                echo "
-                                <script>
-                                    Swal.fire({
-                                        title: 'Sukses!',
-                                        text: 'Data berhasil diubah',
-                                        icon: 'success',
-                                        confirmButtonColor: '#198754',
-                                        confirmButtonText: 'OK'
-                                    }).then(() => {
-                                        window.location.href = 'data_siswa.php';
-                                    });
-                                </script>";
-                                exit;
+                                $stmt->bind_param("ssssssi", $nisn, $nama, $jenis_kelamin, $sekolah_id, $kelas, $jenis_inklusi, $id);
+                                if ($stmt->execute()) {
+                                    echo "
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Sukses!',
+                                            text: 'Data berhasil diubah',
+                                            icon: 'success',
+                                            confirmButtonColor: '#198754',
+                                            confirmButtonText: 'OK'
+                                        }).then(() => {
+                                            window.location.href = 'data_siswa.php';
+                                        });
+                                    </script>";
+                                    exit;
+                                } else {
+                                    echo "<div class='alert alert-danger'>Gagal mengubah data: " . htmlspecialchars($conn->error) . "</div>";
+                                }
+                                $stmt->close();
                             } else {
                                 echo "<div class='alert alert-danger'>Data tidak lengkap!</div>";
                             }
+                            // Ambil data siswa lagi setelah update (agar form tetap terisi benar)
+                            $data = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM data_siswa WHERE id=$id"));
                         }
-
-                        // Ambil data siswa lagi setelah update (agar form tetap terisi benar)
-                        $data = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM data_siswa WHERE id=$id"));
                         ?>
 
                         <form method="POST" id="form-edit-siswa">
@@ -112,6 +115,10 @@ include '../koneksi.php';
                                     <option value="">-- Pilih Kelas --</option>
                                     <!-- Opsi kelas akan diisi otomatis oleh JS -->
                                 </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Jenis Inklusi</label>
+                                <input type="text" name="jenis_inklusi" class="form-control" value="<?= htmlspecialchars($data['jenis_inklusi']) ?>" placeholder="Contoh: Tunanetra, Autisme, dsb">
                             </div>
                             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
                             <a href="data_siswa.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>

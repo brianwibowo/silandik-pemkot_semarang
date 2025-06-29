@@ -39,11 +39,12 @@ $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah 
                             $jenis_kelamin = $_POST['jenis_kelamin'];
                             $sekolah_id_post = (int)$_POST['sekolah_id'];
                             $kelas = trim($_POST['kelas']);
+                            $jenis_inklusi = trim($_POST['jenis_inklusi']);
 
                             // Validasi sederhana
                             if ($nama && $kelas && in_array($jenis_kelamin, ['L', 'P']) && $sekolah_id_post > 0) {
-                                $query = "INSERT INTO data_siswa (sekolah_id, nisn, nama_siswa, jenis_kelamin, kelas) 
-                                          VALUES ($sekolah_id_post, '$nisn', '$nama', '$jenis_kelamin', '$kelas')";
+                                $query = "INSERT INTO data_siswa (sekolah_id, nisn, nama_siswa, jenis_kelamin, kelas, jenis_inklusi) 
+                                          VALUES ($sekolah_id_post, '$nisn', '$nama', '$jenis_kelamin', '$kelas', '$jenis_inklusi')";
                                 mysqli_query($conn, $query);
 
                                 echo "
@@ -99,8 +100,11 @@ $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah 
                                 <label class="form-label">Kelas</label>
                                 <select name="kelas" id="kelas" class="form-control" required>
                                     <option value="">-- Pilih Kelas --</option>
-                                    <!-- Opsi kelas akan diisi otomatis oleh JS -->
                                 </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Jenis Inklusi</label>
+                                <input type="text" name="jenis_inklusi" class="form-control" placeholder="Contoh: Tunanetra, Autisme, dsb">
                             </div>
                             <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Tambah</button>
                             <a href="detail_sekolahh_inklusi.php?id=<?= $sekolah_id ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
@@ -131,7 +135,6 @@ function updateKelasOptions() {
     kelasSelect.innerHTML = kelasOptions;
 }
 
-// Set kelas otomatis jika asal sekolah sudah terpilih saat load
 window.addEventListener('DOMContentLoaded', function() {
     updateKelasOptions();
 });
