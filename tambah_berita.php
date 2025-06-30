@@ -2,90 +2,84 @@
 session_start();
 include 'koneksi.php';
 
-// Penyesuaian: pengurus juga boleh tambah berita
+// Cek role
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
     header('Location: login.php');
     exit;
 }
 
-$success = $error = "";
+// Buat CSRF token jika belum ada
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-// Proses Tambah
+$error = "";
+
+// Proses tambah berita
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $judul = trim($_POST['judul']);
-    $isi = trim($_POST['isi']);
-    $kategori = $_POST['kategori'];
-    $penulis = $_SESSION['username'] ?? 'Admin';
-
-    // Validasi input
-    if (empty($judul) || empty($isi)) {
-        $error = "Judul dan isi berita harus diisi.";
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = "Token tidak valid. Silakan muat ulang halaman.";
     } else {
-        $gambar_name = "";
+        $judul = trim($_POST['judul']);
+        $isi = trim($_POST['isi']);
+        $kategori = $_POST['kategori'];
+        $penulis = $_SESSION['username'] ?? 'Admin';
 
-        // Proses upload gambar jika ada
-        if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === UPLOAD_ERR_OK) {
-            $gambar = $_FILES['gambar']['name'];
-            $tmp = $_FILES['gambar']['tmp_name'];
-            $file_size = $_FILES['gambar']['size'];
-            $file_type = $_FILES['gambar']['type'];
+        $isi = strip_tags($isi, '<p><br><b><i><strong><em><ul><ol><li><a>');
 
-            // Validasi tipe file
-            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            if (!in_array($file_type, $allowed_types)) {
-                $error = "Tipe file tidak diizinkan. Gunakan JPG, PNG, atau GIF.";
-            }
-            // Validasi ukuran file (max 5MB)
-            elseif ($file_size > 5 * 1024 * 1024) {
-                $error = "Ukuran file terlalu besar. Maksimal 5MB.";
-            } else {
-                // Buat nama file unik untuk menghindari konflik
-                $file_extension = pathinfo($gambar, PATHINFO_EXTENSION);
-                $gambar_name = uniqid() . '_' . time() . '.' . $file_extension;
+        if (empty($judul) || empty($isi)) {
+            $error = "Judul dan isi berita harus diisi.";
+        } else {
+            $gambar_name = "";
 
-                // Pastikan folder upload/berita/ ada
-                $upload_dir = 'upload/berita/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
-                }
+            // Proses upload gambar
+            if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === UPLOAD_ERR_OK) {
+                $gambar = $_FILES['gambar']['name'];
+                $tmp = $_FILES['gambar']['tmp_name'];
+                $file_size = $_FILES['gambar']['size'];
+                $file_type = $_FILES['gambar']['type'];
 
-                $target = $upload_dir . $gambar_name;
+                $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!in_array($file_type, $allowed_types)) {
+                    $error = "Tipe file tidak diizinkan. Gunakan JPG, PNG, atau GIF.";
+                } elseif ($file_size > 5 * 1024 * 1024) {
+                    $error = "Ukuran file terlalu besar. Maksimal 5MB.";
+                } else {
+                    $file_extension = pathinfo($gambar, PATHINFO_EXTENSION);
+                    $gambar_name = md5(uniqid(mt_rand(), true)) . '.' . $file_extension;
 
-                // Upload file
-                if (!move_uploaded_file($tmp, $target)) {
-                    $error = "Gagal mengunggah gambar.";
-                    $gambar_name = ""; // Reset jika gagal
-                }
-            }
-        }
-        // Simpan ke database jika tidak ada error
-        if (empty($error)) {
-            $stmt = $conn->prepare("INSERT INTO berita (judul, isi, gambar, penulis, kategori, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-            $stmt->bind_param("sssss", $judul, $isi, $gambar_name, $penulis, $kategori);
+                    $upload_dir = 'upload/berita/';
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
 
-            if ($stmt->execute()) {
-                echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-                echo "<script>
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        text: 'Berita berhasil ditambahkan',
-                        icon: 'success',
-                        confirmButtonColor: '#667eea',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = 'index.php?success=add';
-                    });
-                </script>";
-                exit;
-            } else {
-                $error = "Gagal menyimpan berita ke database: " . $conn->error;
-                // Hapus file yang sudah diupload jika gagal simpan ke DB
-                if (!empty($gambar_name) && file_exists($target)) {
-                    unlink($target);
+                    $target = $upload_dir . $gambar_name;
+
+                    if (!move_uploaded_file($tmp, $target)) {
+                        $error = "Gagal mengunggah gambar.";
+                        $gambar_name = "";
+                    }
                 }
             }
 
-            if ($stmt) $stmt->close();
+            // Simpan ke database jika tidak ada error
+            if (empty($error)) {
+                $stmt = $conn->prepare("INSERT INTO berita (judul, isi, gambar, penulis, kategori, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+                $stmt->bind_param("sssss", $judul, $isi, $gambar_name, $penulis, $kategori);
+
+                if ($stmt->execute()) {
+                    $_SESSION['success'] = "Berita berhasil ditambahkan.";
+                    header("Location: index.php");
+                    exit;
+                } else {
+                    $error = "Gagal menyimpan berita ke database: " . $conn->error;
+                    if (!empty($gambar_name) && file_exists($target)) {
+                        unlink($target);
+                    }
+                }
+
+                if ($stmt) $stmt->close();
+            }
         }
     }
 }
@@ -112,32 +106,30 @@ include 'sidebar.php';
     .btn {
         border-radius: 0.35rem;
     }
-
-    .alert {
-        border-radius: 0.35rem;
-    }
 </style>
+
+<script src="assets/js/sweetalert2.all.min.js"></script>
+<?php if ($error): ?>
+<script>
+    Swal.fire({
+        title: 'Gagal!',
+        text: <?= json_encode($error); ?>,
+        icon: 'error',
+        confirmButtonColor: '#d33'
+    });
+</script>
+<?php endif; ?>
 
 <div id="layoutSidenav_content">
     <main>
         <div class="container-fluid px-4">
             <h1 class="mt-4">Tambah Berita</h1>
 
-            <?php if ($success): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?= $success; ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php elseif ($error): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= $error; ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-
             <div class="card">
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+
                         <div class="mb-3">
                             <label for="judul" class="form-label">Judul <span class="text-danger">*</span></label>
                             <input type="text" name="judul" class="form-control" required

@@ -3,41 +3,103 @@ session_start();
 include 'koneksi.php';
 include 'partials/head.php';
 
-// Ambil 4 kegiatan terbaru dari info_sekolah_inklusi
-$qKegiatan = mysqli_query($conn, "
+// Fungsi ambil data berita dengan pagination yang lebih aman
+function getPaginationData($conn, $kategori, $limit, $page)
+{
+    // Validasi input
+    $kategori = mysqli_real_escape_string($conn, $kategori);
+    $limit = (int) $limit;
+    $page = (int) $page;
+    $offset = ($page - 1) * $limit;
+    
+    // Query dengan prepared statement
+    $stmt = mysqli_prepare($conn, "SELECT * FROM berita WHERE kategori = ? ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    mysqli_stmt_bind_param($stmt, "sii", $kategori, $limit, $offset);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    // Count query dengan prepared statement
+    $countStmt = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM berita WHERE kategori = ?");
+    mysqli_stmt_bind_param($countStmt, "s", $kategori);
+    mysqli_stmt_execute($countStmt);
+    $countResult = mysqli_stmt_get_result($countStmt);
+    $totalRows = mysqli_fetch_assoc($countResult)['total'];
+    $totalPages = ceil($totalRows / $limit);
+    
+    return [
+        'result' => $result,
+        'totalPages' => $totalPages,
+        'totalRows' => $totalRows
+    ];
+}
+
+// Validasi dan sanitasi parameter
+$limit = 4;
+$pageSekolah = isset($_GET['page_sekolah']) ? max(1, (int) $_GET['page_sekolah']) : 1;
+$pageDinas = isset($_GET['page_dinas']) ? max(1, (int) $_GET['page_dinas']) : 1;
+
+$dataSekolah = getPaginationData($conn, 'sekolah', $limit, $pageSekolah);
+$dataDinas = getPaginationData($conn, 'dinas', $limit, $pageDinas);
+
+// Query kegiatan sekolah inklusi terbaru (4 data) dengan prepared statement
+$stmt = mysqli_prepare($conn, "
     SELECT info.*, sekolah.nama_sekolah 
     FROM info_sekolah_inklusi AS info
     LEFT JOIN data_sekolah_inklusi AS sekolah ON info.sekolah_id = sekolah.id
     ORDER BY info.tanggal DESC
     LIMIT 4
 ");
+mysqli_stmt_execute($stmt);
+$qKegiatan = mysqli_stmt_get_result($stmt);
+
+// Fungsi helper untuk sanitasi output
+function sanitizeOutput($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+// Fungsi untuk format tanggal
+function formatDate($date, $format = 'M d, Y') {
+    return date($format, strtotime($date));
+}
+
+// Fungsi untuk truncate text
+function truncateText($text, $length = 100, $suffix = '...') {
+    $text = strip_tags($text);
+    return mb_strimwidth($text, 0, $length, $suffix, 'UTF-8');
+}
 ?>
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beranda - Sistem Informasi Sekolah Inklusi</title>
+    <meta name="description" content="Portal berita dan informasi sekolah inklusi">
+</head>
+<body>
 <div id="background">
     <?php include 'sidebar.php'; ?>
 
     <main>
         <div class="container-fluid px-4">
-            <!-- Header Section -->
-            <div class="page-header">
-                <h1 class="page-title">Beranda</h1>
-                <p class="page-subtitle">Info terbaru mengenai sekolah inklusi</p>
-            </div>
+            <h1 class="mt-4">Beranda</h1>
 
             <!-- Search & Filter Section -->
             <div class="search-filter-section">
                 <div class="search-filter-container">
                     <div class="search-box">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Cari judul/isi berita..." id="searchBeritaInput">
+                        <input type="text" class="search-input" placeholder="Cari judul/isi berita..." id="searchBeritaInput" aria-label="Pencarian berita">
                     </div>
 
-                    <select class="filter-select" id="kategoriBeritaFilter">
+                    <select class="filter-select" id="kategoriBeritaFilter" aria-label="Filter kategori berita">
                         <option value="">Semua Kategori</option>
                         <option value="dinas">Berita Dinas</option>
                         <option value="sekolah">Berita Sekolah</option>
                     </select>
 
-                    <select class="filter-select" id="sortBeritaFilter">
+                    <select class="filter-select" id="sortBeritaFilter" aria-label="Urutkan berita">
                         <option value="">Urutkan berdasarkan</option>
                         <option value="judul">Judul A-Z</option>
                         <option value="baru">Tanggal Terbaru</option>
@@ -45,7 +107,7 @@ $qKegiatan = mysqli_query($conn, "
                     </select>
 
                     <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus'])) : ?>
-                        <a href="tambah_berita.php" class="btn-add">
+                        <a href="tambah_berita.php" class="btn-add" aria-label="Tambah berita baru">
                             <i class="fas fa-plus"></i>
                             Tambah Berita
                         </a>
@@ -54,29 +116,31 @@ $qKegiatan = mysqli_query($conn, "
             </div>
 
             <!-- Berita Sekolah Section -->
-            <div class="news-section" id="beritaSekolahSection">
+            <section class="news-section" id="beritaSekolahSection">
                 <div class="section-header">
-                    <div class="section-icon-title">
-                        <i class="fas fa-graduation-cap section-icon"></i>
-                        <h2 class="section-title">Berita Sekolah</h2>
-                    </div>
+                    <h2>Berita Sekolah</h2>
                 </div>
-
-                <div class="news-grid berita-list">
+                <div class="news-grid berita-list" role="region" aria-label="Daftar berita sekolah">
                     <?php
-                    $qSekolah = mysqli_query($conn, "SELECT * FROM berita WHERE kategori='sekolah' ORDER BY created_at DESC LIMIT 3");
                     $adaSekolah = false;
-                    while ($b = mysqli_fetch_assoc($qSekolah)): $adaSekolah = true; ?>
-                        <div class="news-card berita-card"
-                            data-judul="<?= strtolower(htmlspecialchars($b['judul'])) ?>"
+                    while ($b = mysqli_fetch_assoc($dataSekolah['result'])): 
+                        $adaSekolah = true; 
+                        $judulSanitized = sanitizeOutput($b['judul']);
+                        $isiSanitized = sanitizeOutput($b['isi']);
+                    ?>
+                        <article class="news-card berita-card"
+                            data-judul="<?= strtolower($judulSanitized) ?>"
                             data-isi="<?= strtolower(strip_tags($b['isi'])) ?>"
                             data-kategori="sekolah"
                             data-tanggal="<?= $b['created_at'] ?>">
 
-                            <!-- News Image -->
                             <div class="news-image-container">
                                 <?php if (!empty($b['gambar']) && file_exists("upload/berita/" . $b['gambar'])): ?>
-                                    <img src="upload/berita/<?= htmlspecialchars($b['gambar']) ?>" class="news-image" alt="<?= htmlspecialchars($b['judul']) ?>">
+                                    <img src="upload/berita/<?= sanitizeOutput($b['gambar']) ?>" 
+                                         loading="lazy" 
+                                         class="news-image" 
+                                         alt="<?= $judulSanitized ?>"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <?php else: ?>
                                     <div class="news-image-placeholder">
                                         <i class="fas fa-image"></i>
@@ -85,70 +149,94 @@ $qKegiatan = mysqli_query($conn, "
                                 <div class="news-badge sekolah">BERITA</div>
                             </div>
 
-                            <!-- News Content -->
                             <div class="news-content">
                                 <div class="news-meta">
-                                    <span class="news-date"><?= date('M d, Y', strtotime($b['created_at'])) ?></span>
+                                    <time class="news-date" datetime="<?= $b['created_at'] ?>">
+                                        <?= formatDate($b['created_at']) ?>
+                                    </time>
                                     <span class="news-category">BERITA SEKOLAH</span>
                                 </div>
 
-                                <h3 class="news-title"><?= htmlspecialchars($b['judul']) ?></h3>
+                                <h3 class="news-title"><?= $judulSanitized ?></h3>
 
-                                <p class="news-excerpt"><?= htmlspecialchars(mb_strimwidth(strip_tags($b['isi']), 0, 100, '...')) ?></p>
+                                <p class="news-excerpt"><?= truncateText($b['isi']) ?></p>
 
                                 <div class="news-actions">
-                                    <a href="detail_berita.php?id=<?= $b['id'] ?>" class="read-more-btn">
-                                        Read more <i class="fas fa-external-link-alt"></i>
+                                    <a href="detail_berita.php?id=<?= (int)$b['id'] ?>" 
+                                       class="read-more-btn"
+                                       aria-label="Baca selengkapnya: <?= $judulSanitized ?>">
+                                        Baca selengkapnya <i class="fas fa-external-link-alt"></i>
                                     </a>
 
                                     <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus'])) : ?>
                                         <div class="admin-actions">
-                                            <a href="edit_berita.php?id=<?= $b['id'] ?>" class="btn-edit" title="Edit">
+                                            <a href="edit_berita.php?id=<?= (int)$b['id'] ?>" 
+                                               class="btn-edit" 
+                                               title="Edit berita"
+                                               aria-label="Edit berita: <?= $judulSanitized ?>">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="hapus_berita.php?id=<?= $b['id'] ?>" class="btn-delete"
-                                                onclick="return confirm('Yakin ingin menghapus berita ini?')" title="Hapus">
+                                            <a href="hapus_berita.php?id=<?= (int)$b['id'] ?>" 
+                                               class="btn-delete"
+                                               onclick="return confirm('Yakin ingin menghapus berita ini?')" 
+                                               title="Hapus berita"
+                                               aria-label="Hapus berita: <?= $judulSanitized ?>">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                        </div>
+                        </article>
                     <?php endwhile;
                     if (!$adaSekolah): ?>
                         <div class="empty-state">
-                            <i class="fas fa-newspaper empty-icon"></i>
+                            <i class="fas fa-newspaper empty-icon" aria-hidden="true"></i>
                             <p>Belum ada berita sekolah</p>
                         </div>
                     <?php endif; ?>
                 </div>
-            </div>
+
+                <!-- Pagination Berita Sekolah -->
+                <?php if ($dataSekolah['totalPages'] > 1): ?>
+                <nav class="pagination mt-3" aria-label="Navigasi halaman berita sekolah">
+                    <?php for ($i = 1; $i <= $dataSekolah['totalPages']; $i++): ?>
+                        <a href="?page_sekolah=<?= $i ?>&page_dinas=<?= $pageDinas ?>" 
+                           class="btn <?= ($i == $pageSekolah) ? 'btn-primary' : 'btn-light' ?>"
+                           <?= ($i == $pageSekolah) ? 'aria-current="page"' : '' ?>>
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+                </nav>
+                <?php endif; ?>
+            </section>
 
             <!-- Berita Dinas Section -->
-            <div class="news-section" id="beritaDinasSection">
+            <section class="news-section mt-5" id="beritaDinasSection">
                 <div class="section-header">
-                    <div class="section-icon-title">
-                        <i class="fas fa-bullhorn section-icon"></i>
-                        <h2 class="section-title">Berita Dinas</h2>
-                    </div>
+                    <h2>Berita Dinas</h2>
                 </div>
-
-                <div class="news-grid berita-list">
+                <div class="news-grid berita-list" role="region" aria-label="Daftar berita dinas">
                     <?php
-                    $qDinas = mysqli_query($conn, "SELECT * FROM berita WHERE kategori='dinas' ORDER BY created_at DESC LIMIT 3");
                     $adaDinas = false;
-                    while ($b = mysqli_fetch_assoc($qDinas)): $adaDinas = true; ?>
-                        <div class="news-card berita-card"
-                            data-judul="<?= strtolower(htmlspecialchars($b['judul'])) ?>"
+                    while ($b = mysqli_fetch_assoc($dataDinas['result'])): 
+                        $adaDinas = true;
+                        $judulSanitized = sanitizeOutput($b['judul']);
+                        $isiSanitized = sanitizeOutput($b['isi']);
+                    ?>
+                        <article class="news-card berita-card"
+                            data-judul="<?= strtolower($judulSanitized) ?>"
                             data-isi="<?= strtolower(strip_tags($b['isi'])) ?>"
                             data-kategori="dinas"
                             data-tanggal="<?= $b['created_at'] ?>">
 
-                            <!-- News Image -->
                             <div class="news-image-container">
                                 <?php if (!empty($b['gambar']) && file_exists("upload/berita/" . $b['gambar'])): ?>
-                                    <img src="upload/berita/<?= htmlspecialchars($b['gambar']) ?>" class="news-image" alt="<?= htmlspecialchars($b['judul']) ?>">
+                                    <img src="upload/berita/<?= sanitizeOutput($b['gambar']) ?>" 
+                                         loading="lazy" 
+                                         class="news-image" 
+                                         alt="<?= $judulSanitized ?>"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <?php else: ?>
                                     <div class="news-image-placeholder">
                                         <i class="fas fa-image"></i>
@@ -157,160 +245,137 @@ $qKegiatan = mysqli_query($conn, "
                                 <div class="news-badge dinas">BERITA</div>
                             </div>
 
-                            <!-- News Content -->
                             <div class="news-content">
                                 <div class="news-meta">
-                                    <span class="news-date"><?= date('M d, Y', strtotime($b['created_at'])) ?></span>
+                                    <time class="news-date" datetime="<?= $b['created_at'] ?>">
+                                        <?= formatDate($b['created_at']) ?>
+                                    </time>
                                     <span class="news-category">BERITA DINAS</span>
                                 </div>
 
-                                <h3 class="news-title"><?= htmlspecialchars($b['judul']) ?></h3>
+                                <h3 class="news-title"><?= $judulSanitized ?></h3>
 
-                                <p class="news-excerpt"><?= htmlspecialchars(mb_strimwidth(strip_tags($b['isi']), 0, 100, '...')) ?></p>
+                                <p class="news-excerpt"><?= truncateText($b['isi']) ?></p>
 
                                 <div class="news-actions">
-                                    <a href="detail_berita.php?id=<?= $b['id'] ?>" class="read-more-btn">
-                                        Read more <i class="fas fa-external-link-alt"></i>
+                                    <a href="detail_berita.php?id=<?= (int)$b['id'] ?>" 
+                                       class="read-more-btn"
+                                       aria-label="Baca selengkapnya: <?= $judulSanitized ?>">
+                                        Baca selengkapnya <i class="fas fa-external-link-alt"></i>
                                     </a>
 
                                     <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus'])) : ?>
                                         <div class="admin-actions">
-                                            <a href="edit_berita.php?id=<?= $b['id'] ?>" class="btn-edit" title="Edit">
+                                            <a href="edit_berita.php?id=<?= (int)$b['id'] ?>" 
+                                               class="btn-edit" 
+                                               title="Edit berita"
+                                               aria-label="Edit berita: <?= $judulSanitized ?>">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="hapus_berita.php?id=<?= $b['id'] ?>" class="btn-delete"
-                                                onclick="return confirm('Yakin ingin menghapus berita ini?')" title="Hapus">
+                                            <a href="hapus_berita.php?id=<?= (int)$b['id'] ?>" 
+                                               class="btn-delete"
+                                               onclick="return confirm('Yakin ingin menghapus berita ini?')" 
+                                               title="Hapus berita"
+                                               aria-label="Hapus berita: <?= $judulSanitized ?>">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                        </div>
+                        </article>
                     <?php endwhile;
                     if (!$adaDinas): ?>
                         <div class="empty-state">
-                            <i class="fas fa-newspaper empty-icon"></i>
+                            <i class="fas fa-newspaper empty-icon" aria-hidden="true"></i>
                             <p>Belum ada berita dinas</p>
                         </div>
                     <?php endif; ?>
                 </div>
-            </div>
+
+                <!-- Pagination Berita Dinas -->
+                <?php if ($dataDinas['totalPages'] > 1): ?>
+                <nav class="pagination mt-3" aria-label="Navigasi halaman berita dinas">
+                    <?php for ($i = 1; $i <= $dataDinas['totalPages']; $i++): ?>
+                        <a href="?page_dinas=<?= $i ?>&page_sekolah=<?= $pageSekolah ?>" 
+                           class="btn <?= ($i == $pageDinas) ? 'btn-primary' : 'btn-light' ?>"
+                           <?= ($i == $pageDinas) ? 'aria-current="page"' : '' ?>>
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+                </nav>
+                <?php endif; ?>
+            </section>
 
             <!-- Kegiatan Sekolah Inklusi Section -->
-            <div class="news-section" id="kegiatanSekolahSection">
+            <section class="news-section mt-5" id="kegiatanSekolahSection">
                 <div class="section-header">
-                    <div class="section-icon-title">
-                        <i class="fas fa-calendar-alt section-icon"></i>
-                        <h2 class="section-title">Kegiatan Sekolah Inklusi</h2>
-                    </div>
+                    <h2>Kegiatan Sekolah Inklusi</h2>
                 </div>
-                <div class="news-grid">
+                <div class="news-grid" role="region" aria-label="Daftar kegiatan sekolah inklusi">
                     <?php
                     $adaKegiatan = false;
-                    while ($k = mysqli_fetch_assoc($qKegiatan)): $adaKegiatan = true; ?>
-                        <div class="news-card">
-                            <?php if (!empty($k['foto']) && file_exists("uploads/" . $k['foto'])): ?>
-                                <img src="uploads/<?= htmlspecialchars($k['foto']) ?>" class="news-image" alt="<?= htmlspecialchars($k['nama_kegiatan']) ?>" style="height:200px;object-fit:cover;">
-                            <?php else: ?>
-                                <div class="news-image-placeholder" style="height:200px;">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                            <?php endif; ?>
+                    while ($k = mysqli_fetch_assoc($qKegiatan)): 
+                        $adaKegiatan = true;
+                        $namaKegiatanSanitized = sanitizeOutput($k['nama_kegiatan']);
+                        $namaSekolahSanitized = sanitizeOutput($k['nama_sekolah'] ?? 'Tidak diketahui');
+                    ?>
+                        <article class="news-card">
+                            <div class="news-image-container">
+                                <?php if (!empty($k['foto']) && file_exists("uploads/" . $k['foto'])): ?>
+                                    <img src="uploads/<?= sanitizeOutput($k['foto']) ?>" 
+                                         loading="lazy" 
+                                         class="news-image" 
+                                         alt="<?= $namaKegiatanSanitized ?>" 
+                                         style="height:200px;object-fit:cover;"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <?php else: ?>
+                                    <div class="news-image-placeholder" style="height:200px;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                             <div class="news-content">
                                 <div class="news-meta">
-                                    <span class="news-date"><?= date('d M Y', strtotime($k['tanggal'])) ?></span>
-                                    <span class="news-category"><?= htmlspecialchars($k['nama_sekolah']) ?></span>
+                                    <time class="news-date" datetime="<?= $k['tanggal'] ?>">
+                                        <?= formatDate($k['tanggal'], 'd M Y') ?>
+                                    </time>
+                                    <span class="news-category"><?= $namaSekolahSanitized ?></span>
                                 </div>
-                                <h3 class="news-title"><?= htmlspecialchars($k['nama_kegiatan']) ?></h3>
+                                <h3 class="news-title"><?= $namaKegiatanSanitized ?></h3>
                             </div>
-                        </div>
+                        </article>
                     <?php endwhile;
                     if (!$adaKegiatan): ?>
                         <div class="empty-state">
-                            <i class="fas fa-calendar-alt empty-icon"></i>
+                            <i class="fas fa-calendar-alt empty-icon" aria-hidden="true"></i>
                             <p>Belum ada kegiatan sekolah inklusi</p>
                         </div>
                     <?php endif; ?>
                 </div>
-            </div>
-
+            </section>
         </div>
     </main>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchBeritaInput');
-        const kategoriFilter = document.getElementById('kategoriBeritaFilter');
-        const sortFilter = document.getElementById('sortBeritaFilter');
-        const beritaCards = document.querySelectorAll('.berita-card');
-        const beritaSections = document.querySelectorAll('.news-section');
-
-        function filterBerita() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            const kategori = kategoriFilter.value;
-            const sortBy = sortFilter.value;
-
-            beritaSections.forEach(section => {
-                let cards = Array.from(section.querySelectorAll('.berita-card'));
-
-                // Filter cards
-                let visibleCards = cards.filter(card => {
-                    const judul = card.getAttribute('data-judul');
-                    const isi = card.getAttribute('data-isi');
-                    const kat = card.getAttribute('data-kategori');
-
-                    const matchSearch = !searchTerm || judul.includes(searchTerm) || isi.includes(searchTerm);
-                    const matchKategori = !kategori || kat === kategori;
-
-                    return matchSearch && matchKategori;
-                });
-
-                // Hide all cards first
-                cards.forEach(card => {
-                    card.style.display = 'none';
-                });
-
-                // Show filtered cards
-                visibleCards.forEach(card => {
-                    card.style.display = 'block';
-                });
-
-                // Sort visible cards
-                if (sortBy && visibleCards.length > 1) {
-                    visibleCards.sort((a, b) => {
-                        if (sortBy === 'judul') {
-                            return a.getAttribute('data-judul').localeCompare(b.getAttribute('data-judul'));
-                        } else if (sortBy === 'baru') {
-                            return new Date(b.getAttribute('data-tanggal')) - new Date(a.getAttribute('data-tanggal'));
-                        } else if (sortBy === 'lama') {
-                            return new Date(a.getAttribute('data-tanggal')) - new Date(b.getAttribute('data-tanggal'));
-                        }
-                        return 0;
-                    });
-
-                    const parent = visibleCards[0].parentNode;
-                    visibleCards.forEach(card => parent.appendChild(card));
-                }
-            });
-        }
-
-        searchInput.addEventListener('input', filterBerita);
-        kategoriFilter.addEventListener('change', filterBerita);
-        sortFilter.addEventListener('change', filterBerita);
-    });
-</script>
 
 <style>
     /* Global Styles */
     body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
     }
 
     #background {
         background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    /* Focus styles for accessibility */
+    *:focus {
+        outline: 2px solid #4a90e2;
+        outline-offset: 2px;
     }
 
     /* Page Header */
@@ -361,6 +426,7 @@ $qKegiatan = mysqli_query($conn, "
         top: 50%;
         transform: translateY(-50%);
         color: #6c757d;
+        pointer-events: none;
     }
 
     .search-input {
@@ -370,10 +436,10 @@ $qKegiatan = mysqli_query($conn, "
         border-radius: 8px;
         font-size: 0.95rem;
         transition: all 0.3s ease;
+        background: white;
     }
 
     .search-input:focus {
-        outline: none;
         border-color: #4a90e2;
         box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
@@ -387,10 +453,10 @@ $qKegiatan = mysqli_query($conn, "
         font-size: 0.95rem;
         min-width: 160px;
         cursor: pointer;
+        transition: all 0.3s ease;
     }
 
     .filter-select:focus {
-        outline: none;
         border-color: #4a90e2;
         box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
@@ -406,9 +472,12 @@ $qKegiatan = mysqli_query($conn, "
         text-decoration: none;
         font-weight: 500;
         transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
     }
 
-    .btn-add:hover {
+    .btn-add:hover,
+    .btn-add:focus {
         background: #357abd;
         color: white;
         text-decoration: none;
@@ -423,29 +492,20 @@ $qKegiatan = mysqli_query($conn, "
         margin-bottom: 2rem;
     }
 
-    .section-icon-title {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .section-icon {
-        width: 24px;
-        height: 24px;
-        color: #495057;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
+    .section-header h2 {
+        font-size: 1.75rem;
         font-weight: 600;
         color: #2c3e50;
         margin: 0;
+        border-bottom: 3px solid #4a90e2;
+        padding-bottom: 0.5rem;
+        display: inline-block;
     }
 
     /* News Grid */
     .news-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 2rem;
     }
 
@@ -456,6 +516,7 @@ $qKegiatan = mysqli_query($conn, "
         overflow: hidden;
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
+        position: relative;
     }
 
     .news-card:hover {
@@ -467,6 +528,7 @@ $qKegiatan = mysqli_query($conn, "
         position: relative;
         height: 200px;
         overflow: hidden;
+        background: #f8f9fa;
     }
 
     .news-image {
@@ -503,6 +565,7 @@ $qKegiatan = mysqli_query($conn, "
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        z-index: 1;
     }
 
     .news-badge.sekolah {
@@ -527,6 +590,8 @@ $qKegiatan = mysqli_query($conn, "
         text-transform: uppercase;
         font-weight: 500;
         letter-spacing: 0.5px;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .news-date {
@@ -535,6 +600,9 @@ $qKegiatan = mysqli_query($conn, "
 
     .news-category {
         color: #495057;
+        background: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
     }
 
     .news-title {
@@ -544,6 +612,7 @@ $qKegiatan = mysqli_query($conn, "
         line-height: 1.4;
         margin-bottom: 1rem;
         display: -webkit-box;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
@@ -553,12 +622,18 @@ $qKegiatan = mysqli_query($conn, "
         line-height: 1.5;
         margin-bottom: 1.5rem;
         font-size: 0.95rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .news-actions {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .read-more-btn {
@@ -570,15 +645,22 @@ $qKegiatan = mysqli_query($conn, "
         font-weight: 500;
         font-size: 0.9rem;
         transition: all 0.3s ease;
+        padding: 0.5rem 0;
     }
 
-    .read-more-btn:hover {
+    .read-more-btn:hover,
+    .read-more-btn:focus {
         color: #357abd;
         text-decoration: none;
     }
 
     .read-more-btn i {
         font-size: 0.8rem;
+        transition: transform 0.3s ease;
+    }
+
+    .read-more-btn:hover i {
+        transform: translateX(2px);
     }
 
     .admin-actions {
@@ -597,6 +679,8 @@ $qKegiatan = mysqli_query($conn, "
         text-decoration: none;
         font-size: 0.8rem;
         transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
     }
 
     .btn-edit {
@@ -604,7 +688,8 @@ $qKegiatan = mysqli_query($conn, "
         color: white;
     }
 
-    .btn-edit:hover {
+    .btn-edit:hover,
+    .btn-edit:focus {
         background: #e0a800;
         color: white;
     }
@@ -614,7 +699,8 @@ $qKegiatan = mysqli_query($conn, "
         color: white;
     }
 
-    .btn-delete:hover {
+    .btn-delete:hover,
+    .btn-delete:focus {
         background: #c82333;
         color: white;
     }
@@ -625,12 +711,56 @@ $qKegiatan = mysqli_query($conn, "
         text-align: center;
         padding: 3rem;
         color: #6c757d;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
 
     .empty-icon {
         font-size: 3rem;
         margin-bottom: 1rem;
         opacity: 0.5;
+    }
+
+    /* Pagination */
+    .pagination {
+        margin-top: 2rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pagination .btn {
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        text-decoration: none;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        background: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .pagination .btn-primary {
+        background-color: #4a90e2;
+        color: white;
+        border-color: #4a90e2;
+    }
+
+    .pagination .btn:hover,
+    .pagination .btn:focus {
+        background-color: #e9ecef;
+        color: #495057;
+        text-decoration: none;
+    }
+
+    .pagination .btn-primary:hover,
+    .pagination .btn-primary:focus {
+        background-color: #357abd;
+        color: white;
     }
 
     /* Responsive Design */
@@ -663,6 +793,16 @@ $qKegiatan = mysqli_query($conn, "
             gap: 1rem;
             align-items: flex-start;
         }
+
+        .news-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+        }
     }
 
     @media (max-width: 480px) {
@@ -678,8 +818,238 @@ $qKegiatan = mysqli_query($conn, "
         .search-filter-container {
             padding: 1rem;
         }
+
+        .news-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+        }
+
+        .pagination {
+            gap: 0.25rem;
+        }
+
+        .pagination .btn {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    /* Loading and error states */
+    .loading-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+
+    .error-state {
+        text-align: center;
+        padding: 2rem;
+        color: #dc3545;
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+
+    /* Skip to content for accessibility */
+    .skip-to-content {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: #4a90e2;
+        color: white;
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 1000;
+    }
+
+    .skip-to-content:focus {
+        top: 6px;
+    }
+
+    /* Print styles */
+    @media print {
+        .search-filter-section,
+        .admin-actions,
+        .pagination {
+            display: none;
+        }
+        
+        .news-card {
+            break-inside: avoid;
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+        
+        .news-image {
+            max-height: 150px;
+        }
     }
 </style>
+
+<!-- JavaScript untuk filtering dan search -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchBeritaInput');
+    const kategoriFilter = document.getElementById('kategoriBeritaFilter');
+    const sortFilter = document.getElementById('sortBeritaFilter');
+    const beritaCards = document.querySelectorAll('.berita-card');
+
+    // Debounce function untuk search
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Function untuk filter dan search
+    function filterBerita() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const selectedKategori = kategoriFilter.value;
+        const selectedSort = sortFilter.value;
+
+        let visibleCards = Array.from(beritaCards).filter(card => {
+            const judul = card.dataset.judul || '';
+            const isi = card.dataset.isi || '';
+            const kategori = card.dataset.kategori || '';
+
+            // Search filter
+            const matchesSearch = searchTerm === '' || 
+                                judul.includes(searchTerm) || 
+                                isi.includes(searchTerm);
+
+            // Category filter
+            const matchesKategori = selectedKategori === '' || 
+                                   kategori === selectedKategori;
+
+            return matchesSearch && matchesKategori;
+        });
+
+        // Hide all cards first
+        beritaCards.forEach(card => {
+            card.style.display = 'none';
+        });
+
+        // Sort visible cards
+        if (selectedSort === 'judul') {
+            visibleCards.sort((a, b) => {
+                const judulA = a.dataset.judul || '';
+                const judulB = b.dataset.judul || '';
+                return judulA.localeCompare(judulB);
+            });
+        } else if (selectedSort === 'baru') {
+            visibleCards.sort((a, b) => {
+                const tanggalA = new Date(a.dataset.tanggal || 0);
+                const tanggalB = new Date(b.dataset.tanggal || 0);
+                return tanggalB - tanggalA;
+            });
+        } else if (selectedSort === 'lama') {
+            visibleCards.sort((a, b) => {
+                const tanggalA = new Date(a.dataset.tanggal || 0);
+                const tanggalB = new Date(b.dataset.tanggal || 0);
+                return tanggalA - tanggalB;
+            });
+        }
+
+        // Show filtered and sorted cards
+        visibleCards.forEach((card, index) => {
+            card.style.display = 'block';
+            card.style.order = index;
+        });
+
+        // Update empty states
+        updateEmptyStates();
+    }
+
+    // Function untuk update empty states
+    function updateEmptyStates() {
+        const sekolahSection = document.getElementById('beritaSekolahSection');
+        const dinasSection = document.getElementById('beritaDinasSection');
+        
+        const visibleSekolahCards = sekolahSection.querySelectorAll('.berita-card[data-kategori="sekolah"][style*="block"]');
+        const visibleDinasCards = dinasSection.querySelectorAll('.berita-card[data-kategori="dinas"][style*="block"]');
+
+        // Show/hide sections based on visible cards
+        const sekolahGrid = sekolahSection.querySelector('.news-grid');
+        const dinasGrid = dinasSection.querySelector('.news-grid');
+
+        if (visibleSekolahCards.length === 0) {
+            sekolahGrid.innerHTML = '<div class="empty-state"><i class="fas fa-search empty-icon" aria-hidden="true"></i><p>Tidak ada berita sekolah yang sesuai dengan filter</p></div>';
+        }
+
+        if (visibleDinasCards.length === 0) {
+            dinasGrid.innerHTML = '<div class="empty-state"><i class="fas fa-search empty-icon" aria-hidden="true"></i><p>Tidak ada berita dinas yang sesuai dengan filter</p></div>';
+        }
+    }
+
+    // Event listeners dengan debounce untuk search
+    const debouncedFilter = debounce(filterBerita, 300);
+    searchInput.addEventListener('input', debouncedFilter);
+    kategoriFilter.addEventListener('change', filterBerita);
+    sortFilter.addEventListener('change', filterBerita);
+
+    // Error handling untuk gambar yang gagal dimuat
+    document.querySelectorAll('.news-image').forEach(img => {
+        img.addEventListener('error', function() {
+            this.style.display = 'none';
+            const placeholder = this.nextElementSibling;
+            if (placeholder && placeholder.classList.contains('news-image-placeholder')) {
+                placeholder.style.display = 'flex';
+            }
+        });
+    });
+
+    // Lazy loading untuk gambar (fallback jika browser tidak support)
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                        observer.unobserve(img);
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+
+    // Keyboard navigation untuk cards
+    document.querySelectorAll('.news-card').forEach(card => {
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const readMoreBtn = this.querySelector('.read-more-btn');
+                if (readMoreBtn) {
+                    e.preventDefault();
+                    readMoreBtn.click();
+                }
+            }
+        });
+    });
+});
+
+// Function untuk konfirmasi hapus yang lebih accessible
+function confirmDelete(title) {
+    return confirm(`Apakah Anda yakin ingin menghapus berita "${title}"? Tindakan ini tidak dapat dibatalkan.`);
+}
+</script>
+
 <?php include 'partials/footer.php'; ?>
 </body>
 </html>
