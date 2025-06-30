@@ -612,7 +612,6 @@ function truncateText($text, $length = 100, $suffix = '...') {
         line-height: 1.4;
         margin-bottom: 1rem;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
@@ -623,7 +622,6 @@ function truncateText($text, $length = 100, $suffix = '...') {
         margin-bottom: 1.5rem;
         font-size: 0.95rem;
         display: -webkit-box;
-        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
