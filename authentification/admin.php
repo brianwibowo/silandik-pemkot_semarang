@@ -12,17 +12,15 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 $message = "";
 $message_type = "";
 
-// Proses approve/decline dengan prepared statement untuk keamanan
+// Proses approve/decline/change_role
 if (isset($_GET['action'], $_GET['id'])) {
     $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
     $action = $_GET['action'];
     
     if ($id && in_array($action, ['approve', 'decline', 'change_role'])) {
         if ($action === 'approve') {
-            // Set role jadi pengurus, hapus request
             $stmt = mysqli_prepare($conn, "UPDATE users SET role='pengurus', request_pengurus=0 WHERE id=? AND request_pengurus=1");
             mysqli_stmt_bind_param($stmt, "i", $id);
-            
             if (mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) > 0) {
                 $message = "Permintaan berhasil disetujui!";
                 $message_type = "success";
@@ -31,12 +29,9 @@ if (isset($_GET['action'], $_GET['id'])) {
                 $message_type = "error";
             }
             mysqli_stmt_close($stmt);
-            
         } elseif ($action === 'decline') {
-            // Tolak request, hapus request
             $stmt = mysqli_prepare($conn, "UPDATE users SET request_pengurus=0 WHERE id=? AND request_pengurus=1");
             mysqli_stmt_bind_param($stmt, "i", $id);
-            
             if (mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) > 0) {
                 $message = "Permintaan berhasil ditolak.";
                 $message_type = "info";
@@ -45,13 +40,11 @@ if (isset($_GET['action'], $_GET['id'])) {
                 $message_type = "error";
             }
             mysqli_stmt_close($stmt);
-            
         } elseif ($action === 'change_role' && isset($_GET['new_role'])) {
             $new_role = $_GET['new_role'];
             if (in_array($new_role, ['umum', 'pengurus', 'admin'])) {
                 $stmt = mysqli_prepare($conn, "UPDATE users SET role=?, request_pengurus=0 WHERE id=?");
                 mysqli_stmt_bind_param($stmt, "si", $new_role, $id);
-                
                 if (mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) > 0) {
                     $message = "Role user berhasil diubah menjadi " . ucfirst($new_role) . "!";
                     $message_type = "success";
@@ -66,10 +59,29 @@ if (isset($_GET['action'], $_GET['id'])) {
         $message = "ID atau aksi tidak valid.";
         $message_type = "error";
     }
-    
-    // Redirect untuk prevent double action
     header("Location: admin.php" . (!empty($message) ? "?msg=" . urlencode($message) . "&type=" . $message_type : ""));
     exit;
+}
+
+// Proses update sekolah dikelola pengurus
+if (isset($_POST['edit_sekolah_user_id'], $_POST['edit_sekolah_id'])) {
+    $edit_user_id = intval($_POST['edit_sekolah_user_id']);
+    $edit_sekolah_id = intval($_POST['edit_sekolah_id']);
+    // Pastikan usernya pengurus
+    $cek = mysqli_query($conn, "SELECT id FROM users WHERE id=$edit_user_id AND role='pengurus'");
+    if (mysqli_num_rows($cek) > 0) {
+        $upd = mysqli_query($conn, "UPDATE users SET sekolah_id=$edit_sekolah_id WHERE id=$edit_user_id");
+        if ($upd) {
+            $message = "Sekolah yang dikelola berhasil diubah.";
+            $message_type = "success";
+        } else {
+            $message = "Gagal mengubah sekolah yang dikelola.";
+            $message_type = "error";
+        }
+    } else {
+        $message = "User bukan pengurus!";
+        $message_type = "error";
+    }
 }
 
 // Tampilkan pesan jika ada
@@ -78,13 +90,13 @@ if (isset($_GET['msg']) && isset($_GET['type'])) {
     $message_type = htmlspecialchars($_GET['type']);
 }
 
-// Ambil semua request pengurus dengan prepared statement
+// Ambil semua request pengurus
 $stmt_requests = mysqli_prepare($conn, "SELECT id, email, request_pengurus, role, created_at FROM users WHERE request_pengurus=1 ORDER BY created_at DESC");
 mysqli_stmt_execute($stmt_requests);
 $result_requests = mysqli_stmt_get_result($stmt_requests);
 
-// Ambil semua user dengan prepared statement
-$stmt_users = mysqli_prepare($conn, "SELECT id, email, role, request_pengurus, created_at FROM users ORDER BY created_at DESC");
+// Ambil semua user (tambahkan sekolah_id)
+$stmt_users = mysqli_prepare($conn, "SELECT id, email, role, sekolah_id, request_pengurus, created_at FROM users ORDER BY created_at DESC");
 mysqli_stmt_execute($stmt_users);
 $result_users = mysqli_stmt_get_result($stmt_users);
 ?>
@@ -215,6 +227,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                         <th style="width: 50px;">No</th>
                                         <th>Email User</th>
                                         <th>Role</th>
+                                        <th>Sekolah Dikelola</th>
                                         <th>Status Request</th>
                                         <th style="width: 150px;">Tanggal Daftar</th>
                                         <th style="width: 200px;">Aksi</th>
@@ -241,6 +254,21 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                             <span class="badge <?= $role_color ?>"><?= htmlspecialchars(ucfirst($row['role'])) ?></span>
                                         </td>
                                         <td>
+                                            <?php if ($row['role'] === 'pengurus'): 
+                                                $sid = intval($row['sekolah_id']);
+                                                $qSekolah = mysqli_query($conn, "SELECT nama_sekolah FROM data_sekolah_inklusi WHERE id=$sid");
+                                                $dSekolah = mysqli_fetch_assoc($qSekolah);
+                                                $namaSekolah = $dSekolah ? htmlspecialchars($dSekolah['nama_sekolah']) : '<span class="text-danger">Tidak ditemukan</span>';
+                                            ?>
+                                                <span id="nama-sekolah-<?= $row['id'] ?>"><?= $namaSekolah ?></span>
+                                                <button type="button" class="btn btn-sm btn-outline-primary ms-1" onclick="showEditSekolahModal(<?= $row['id'] ?>, <?= $sid ?>)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            <?php else: ?>
+                                                <span class="text-muted small">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
                                             <?php if ($row['request_pengurus'] == 1): ?>
                                                 <span class="badge bg-info">Pending Request</span>
                                             <?php else: ?>
@@ -251,7 +279,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                             <?= isset($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?php if ($row['email'] !== $_SESSION['email']): // Tidak bisa edit role sendiri ?>
+                                            <?php if ($row['email'] !== $_SESSION['email']): ?>
                                             <div class="dropdown">
                                                 <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                                     <i class="fas fa-user-edit"></i> Ubah Role
@@ -301,6 +329,39 @@ $result_users = mysqli_stmt_get_result($stmt_users);
         </div>
     </div>
 
+    <!-- Modal Pilih Sekolah -->
+    <div class="modal fade" id="modalPilihSekolah" tabindex="-1" aria-labelledby="modalPilihSekolahLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="post" id="formPilihSekolah">
+          <input type="hidden" name="edit_sekolah_user_id" id="edit_sekolah_user_id">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalPilihSekolahLabel">Ubah Sekolah Dikelola</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="edit_sekolah_id" class="form-label">Pilih Sekolah</label>
+                <select class="form-select" name="edit_sekolah_id" id="edit_sekolah_id" required>
+                  <option value="">-- Pilih Sekolah --</option>
+                  <?php
+                  $qAllSekolah = mysqli_query($conn, "SELECT id, nama_sekolah FROM data_sekolah_inklusi ORDER BY nama_sekolah ASC");
+                  while ($s = mysqli_fetch_assoc($qAllSekolah)) {
+                      echo '<option value="'.$s['id'].'">'.htmlspecialchars($s['nama_sekolah']).'</option>';
+                  }
+                  ?>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Simpan</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Fungsi untuk konfirmasi aksi approve/decline
@@ -344,6 +405,14 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                     window.location.href = `?action=change_role&id=${id}&new_role=${newRole}`;
                 }
             });
+        }
+
+        // Modal edit sekolah dikelola
+        function showEditSekolahModal(userId, sekolahId) {
+            document.getElementById('edit_sekolah_user_id').value = userId;
+            document.getElementById('edit_sekolah_id').value = sekolahId;
+            var modal = new bootstrap.Modal(document.getElementById('modalPilihSekolah'));
+            modal.show();
         }
 
         // Tampilkan pesan jika ada

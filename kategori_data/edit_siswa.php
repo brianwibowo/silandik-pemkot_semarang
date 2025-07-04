@@ -118,37 +118,65 @@ include '../koneksi.php';
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Jenis Inklusi</label>
-                                <input type="text" name="jenis_inklusi" class="form-control" value="<?= htmlspecialchars($data['jenis_inklusi']) ?>" placeholder="Contoh: Tunanetra, Autisme, dsb">
+                                <select name="jenis_inklusi" class="form-control" required>
+                                    <option value="">-- Pilih Jenis Inklusi --</option>
+                                    <?php
+                                    $daftar_inklusi = [
+                                        'A' => 'Tunanetra',
+                                        'B' => 'Tunarungu',
+                                        'C' => 'Tunagrahita Ringan',
+                                        'C1' => 'Tunagrahita Sedang',
+                                        'D' => 'Tunadaksa Ringan',
+                                        'D1' => 'Tunadaksa Sedang',
+                                        'E' => 'Tunalaras',
+                                        'F' => 'Tunawicara',
+                                        'H' => 'Hiperaktif',
+                                        'I' => 'Cerdas Istimewa',
+                                        'J' => 'Bakat Istimewa',
+                                        'K' => 'Kesulitan Belajar',
+                                        'N' => 'Narkoba',
+                                        'O' => 'Indigo',
+                                        'P' => 'Down Syndrome',
+                                        'Q' => 'Autis',
+                                        'Lain' => 'Lainnya'
+                                    ];
+
+                                    foreach ($daftar_inklusi as $kode => $label) {
+                                        $selected = ($data['jenis_inklusi'] === $kode) ? 'selected' : '';
+                                        echo "<option value=\"$kode\" $selected>$kode - $label</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
                             <a href="data_siswa.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                         </form>
                         <script>
-                        function updateKelasOptions() {
-                            const sekolahSelect = document.getElementById('sekolah_id');
-                            const kelasSelect = document.getElementById('kelas');
-                            const selected = sekolahSelect.options[sekolahSelect.selectedIndex];
-                            const jenjang = selected ? selected.getAttribute('data-jenjang') : '';
-                            let kelasOptions = '<option value="">-- Pilih Kelas --</option>';
-                            if (jenjang === 'SD') {
-                                for (let i = 1; i <= 6; i++) {
-                                    kelasOptions += `<option value="${i}">${i}</option>`;
+                            function updateKelasOptions() {
+                                const sekolahSelect = document.getElementById('sekolah_id');
+                                const kelasSelect = document.getElementById('kelas');
+                                const selected = sekolahSelect.options[sekolahSelect.selectedIndex];
+                                const jenjang = selected ? selected.getAttribute('data-jenjang') : '';
+                                let kelasOptions = '<option value="">-- Pilih Kelas --</option>';
+                                if (jenjang === 'SD') {
+                                    for (let i = 1; i <= 6; i++) {
+                                        kelasOptions += `<option value="${i}">${i}</option>`;
+                                    }
+                                } else if (jenjang === 'SMP' || jenjang === 'SMA' || jenjang === 'SMK') {
+                                    for (let i = 1; i <= 3; i++) {
+                                        kelasOptions += `<option value="${i}">${i}</option>`;
+                                    }
                                 }
-                            } else if (jenjang === 'SMP' || jenjang === 'SMA' || jenjang === 'SMK') {
-                                for (let i = 1; i <= 3; i++) {
-                                    kelasOptions += `<option value="${i}">${i}</option>`;
-                                }
+                                kelasSelect.innerHTML = kelasOptions;
+                                // Set value jika sudah ada (untuk edit)
+                                <?php if (!empty($data['kelas'])): ?>
+                                    kelasSelect.value = "<?= htmlspecialchars($data['kelas']) ?>";
+                                <?php endif; ?>
                             }
-                            kelasSelect.innerHTML = kelasOptions;
-                            // Set value jika sudah ada (untuk edit)
-                            <?php if (!empty($data['kelas'])): ?>
-                                kelasSelect.value = "<?= htmlspecialchars($data['kelas']) ?>";
-                            <?php endif; ?>
-                        }
-                        // Set kelas otomatis saat load
-                        window.addEventListener('DOMContentLoaded', function() {
-                            updateKelasOptions();
-                        });
+                            // Set kelas otomatis saat load
+                            window.addEventListener('DOMContentLoaded', function() {
+                                updateKelasOptions();
+                            });
                         </script>
                     </div>
                 </div>
@@ -159,4 +187,5 @@ include '../koneksi.php';
 
 <?php include '../partials/footer.php'; ?>
 </body>
+
 </html>

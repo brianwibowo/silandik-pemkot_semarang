@@ -4,7 +4,10 @@ include '../config.php';
 include '../partials/head.php';
 include '../koneksi.php';
 
-$isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus']);
+// Cek role
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+$isPengurus = isset($_SESSION['role']) && $_SESSION['role'] === 'pengurus';
+$user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['sekolah_id'] : null;
 ?>
 <div id="background">
     <?php include '../sidebar.php'; ?>
@@ -44,7 +47,7 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                     </div>
 
                     <div class="col-md-3 text-md-center text-start">
-                        <?php if ($isAdminOrPengurus): ?>
+                        <?php if ($isAdmin): ?>
                             <a href="tambah_sekolah_inklusi.php" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Tambah Data
                             </a>
@@ -101,7 +104,6 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
             <!-- Cards Grid -->
             <div class="cards-grid" id="schoolGrid">
                 <?php
-                // Hapus penggunaan created_at/ formatted_date karena tidak ada di tabel
                 $query = mysqli_query($conn, "
                     SELECT *, 
                            COALESCE(jenjang_sekolah, 'SD') as jenjang_sekolah
@@ -126,6 +128,14 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                             'SMA', 'SMK' => 'badge-danger',
                             default => 'badge-secondary'
                         };
+
+                        // Cek hak edit/hapus
+                        $canEdit = false;
+                        if ($isAdmin) {
+                            $canEdit = true;
+                        } elseif ($isPengurus && intval($user_sekolah_id) === intval($row['id'])) {
+                            $canEdit = true;
+                        }
                 ?>
                         <div class="school-card"
                             data-name="<?= strtolower(htmlspecialchars($row['nama_sekolah'])); ?>"
@@ -171,7 +181,7 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                                         Lihat Detail <i class="fas fa-external-link-alt"></i>
                                     </a>
 
-                                    <?php if ($isAdminOrPengurus): ?>
+                                    <?php if ($canEdit): ?>
                                         <div class="admin-actions">
                                             <a href="edit_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn-edit" title="Edit"
                                                 onclick="return confirm('Anda yakin ingin mengedit data ini?')">
@@ -194,7 +204,7 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                         <i class="fas fa-school"></i>
                         <h5>Belum ada data sekolah</h5>
                         <p>Klik tombol "Tambah Data" untuk mulai menambahkan sekolah inklusi</p>
-                        <?php if ($isAdminOrPengurus): ?>
+                        <?php if ($isAdmin): ?>
                             <a href="tambah_sekolah_inklusi.php" class="btn-add">
                                 <i class="fas fa-plus"></i>Tambah Data Pertama
                             </a>

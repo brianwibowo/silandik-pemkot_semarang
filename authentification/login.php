@@ -20,6 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (password_verify($password, $user['password']) || $password === $user['password']) {
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
+            // Set session sekolah_id jika role pengurus
+            if ($user['role'] === 'pengurus' && isset($user['sekolah_id'])) {
+                $_SESSION['sekolah_id'] = $user['sekolah_id'];
+            } else {
+                unset($_SESSION['sekolah_id']);
+            }
             $showSuccess = true; // trigger alert
         } else {
             $error = "Password salah!";

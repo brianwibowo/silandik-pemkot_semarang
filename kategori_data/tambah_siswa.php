@@ -15,7 +15,6 @@ $sekolah_id = isset($_GET['sekolah_id']) ? (int)$_GET['sekolah_id'] : 0;
 
 // Ambil daftar sekolah untuk dropdown
 $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah FROM data_sekolah_inklusi ORDER BY nama_sekolah");
-
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php include '../sidebar.php'; ?>
@@ -41,8 +40,7 @@ $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah 
                             $kelas = trim($_POST['kelas']);
                             $jenis_inklusi = trim($_POST['jenis_inklusi']);
 
-                            // Validasi sederhana
-                            if ($nama && $kelas && in_array($jenis_kelamin, ['L', 'P']) && $sekolah_id_post > 0) {
+                            if ($nama && $kelas && in_array($jenis_kelamin, ['L', 'P']) && $sekolah_id_post > 0 && $jenis_inklusi) {
                                 $query = "INSERT INTO data_siswa (sekolah_id, nisn, nama_siswa, jenis_kelamin, kelas, jenis_inklusi) 
                                           VALUES ($sekolah_id_post, '$nisn', '$nama', '$jenis_kelamin', '$kelas', '$jenis_inklusi')";
                                 mysqli_query($conn, $query);
@@ -104,7 +102,26 @@ $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah 
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Jenis Inklusi</label>
-                                <input type="text" name="jenis_inklusi" class="form-control" placeholder="Contoh: Tunanetra, Autisme, dsb">
+                                <select name="jenis_inklusi" class="form-control" required>
+                                    <option value="">-- Pilih Jenis Inklusi --</option>
+                                    <option value="A">Tunanetra</option>
+                                    <option value="B">Tunarungu</option>
+                                    <option value="C">Tunagrahita Ringan</option>
+                                    <option value="C1">Tunagrahita Sedang</option>
+                                    <option value="D">Tunadaksa Ringan</option>
+                                    <option value="D1">Tunadaksa Sedang</option>
+                                    <option value="E">Tunalaras</option>
+                                    <option value="F">Tunawicara</option>
+                                    <option value="H">Hiperaktif</option>
+                                    <option value="I">Cerdas Istimewa</option>
+                                    <option value="J">Bakat Istimewa</option>
+                                    <option value="K">Kesulitan Belajar</option>
+                                    <option value="N">Narkoba</option>
+                                    <option value="O">Indigo</option>
+                                    <option value="P">Down Syndrome</option>
+                                    <option value="Q">Autis</option>
+                                    <option value="Lain">Lainnya</option>
+                                </select>
                             </div>
                             <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Tambah</button>
                             <a href="detail_sekolahh_inklusi.php?id=<?= $sekolah_id ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
@@ -121,7 +138,7 @@ function updateKelasOptions() {
     const sekolahSelect = document.getElementById('sekolah_id');
     const kelasSelect = document.getElementById('kelas');
     const selected = sekolahSelect.options[sekolahSelect.selectedIndex];
-    const jenjang = selected.getAttribute('data-jenjang');
+    const jenjang = selected ? selected.getAttribute('data-jenjang') : '';
     let kelasOptions = '<option value="">-- Pilih Kelas --</option>';
     if (jenjang === 'SD') {
         for (let i = 1; i <= 6; i++) {

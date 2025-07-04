@@ -12,7 +12,6 @@ include '../koneksi.php';
     <div id="layoutSidenav_content">
         <main>
             <div class="container-fluid px-4">
-                <!-- Header Section -->
                 <div class="header-section">
                     <div class="header-container">
                         <div class="header-title">
@@ -61,10 +60,23 @@ include '../koneksi.php';
                             <div class="filter-section">
                                 <select class="filter-select" id="inklusiFilter">
                                     <option value="">Semua Inklusi</option>
-                                    <option value="Tunanetra">Tunanetra</option>
-                                    <option value="Tunarungu">Tunarungu</option>
-                                    <option value="Tunadaksa">Tunadaksa</option>
-                                    <option value="Autis">Autis</option>
+                                    <option value="A">Tunanetra</option>
+                                    <option value="B">Tunarungu</option>
+                                    <option value="C">Tunagrahita Ringan</option>
+                                    <option value="C1">Tunagrahita Sedang</option>
+                                    <option value="D">Tunadaksa Ringan</option>
+                                    <option value="D1">Tunadaksa Sedang</option>
+                                    <option value="E">Tunalaras</option>
+                                    <option value="F">Tunawicara</option>
+                                    <option value="H">Hiperaktif</option>
+                                    <option value="I">Cerdas Istimewa</option>
+                                    <option value="J">Bakat Istimewa</option>
+                                    <option value="K">Kesulitan Belajar</option>
+                                    <option value="N">Narkoba</option>
+                                    <option value="O">Indigo</option>
+                                    <option value="P">Down Syndrome</option>
+                                    <option value="Q">Autis</option>
+                                    <option value="Lain">Lainnya</option>
                                 </select>
                             </div>
                         </div>
@@ -107,7 +119,30 @@ include '../koneksi.php';
                                             FROM data_siswa s 
                                             LEFT JOIN data_sekolah_inklusi ds ON s.sekolah_id = ds.id
                                             ORDER BY s.id DESC");
+
+                                        $deskripsi = [
+                                            'A' => 'Tunanetra',
+                                            'B' => 'Tunarungu',
+                                            'C' => 'Tunagrahita Ringan',
+                                            'C1' => 'Tunagrahita Sedang',
+                                            'D' => 'Tunadaksa Ringan',
+                                            'D1' => 'Tunadaksa Sedang',
+                                            'E' => 'Tunalaras',
+                                            'F' => 'Tunawicara',
+                                            'H' => 'Hiperaktif',
+                                            'I' => 'Cerdas Istimewa',
+                                            'J' => 'Bakat Istimewa',
+                                            'K' => 'Kesulitan Belajar',
+                                            'N' => 'Narkoba',
+                                            'O' => 'Indigo',
+                                            'P' => 'Down Syndrome',
+                                            'Q' => 'Autis',
+                                            'Lain' => 'Lainnya'
+                                        ];
+
                                         while ($row = mysqli_fetch_assoc($query)) :
+                                            $jenis_kode = $row['jenis_inklusi'];
+                                            $jenis_label = isset($deskripsi[$jenis_kode]) ? $deskripsi[$jenis_kode] : '-';
                                         ?>
                                             <tr>
                                                 <td class="text-center"><?= $no++; ?></td>
@@ -127,7 +162,7 @@ include '../koneksi.php';
                                                     <span class="badge bg-secondary ms-1"><?= htmlspecialchars($row['jenjang_sekolah']); ?></span>
                                                 </td>
                                                 <td class="text-center"><?= htmlspecialchars($row['kelas']); ?></td>
-                                                <td class="text-center"><?= htmlspecialchars($row['jenis_inklusi']); ?></td>
+                                                <td class="text-center" data-kode="<?= $jenis_kode ?>"><?= $jenis_label ?></td>
                                                 <td><?= htmlspecialchars($row['alamat']); ?></td>
                                                 <td class="text-center">
                                                     <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm" title="Edit">
@@ -145,38 +180,7 @@ include '../koneksi.php';
                                     </tbody>
                                 </table>
                             <?php else: ?>
-                                <table class="table table-bordered table-hover align-middle">
-                                    <thead class="table-primary text-center">
-                                        <tr>
-                                            <th style="width:40px;">No.</th>
-                                            <th>Nama Sekolah</th>
-                                            <th style="width:200px;">Jumlah Siswa</th>
-                                            <th>Alamat Sekolah</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $no = 1;
-                                        $qSekolah = mysqli_query($conn, "SELECT id, nama_sekolah, alamat FROM data_sekolah_inklusi ORDER BY nama_sekolah");
-                                        while ($row = mysqli_fetch_assoc($qSekolah)):
-                                            $id = $row['id'];
-                                            $l = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM data_siswa WHERE sekolah_id=$id AND jenis_kelamin='L'"))['total'];
-                                            $p = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM data_siswa WHERE sekolah_id=$id AND jenis_kelamin='P'"))['total'];
-                                            $total = $l + $p;
-                                        ?>
-                                            <tr>
-                                                <td class="text-center"><?= $no++; ?></td>
-                                                <td><?= htmlspecialchars($row['nama_sekolah']); ?></td>
-                                                <td class="text-center">
-                                                    <span class="badge bg-info">L: <?= $l ?></span>
-                                                    <span class="badge bg-pink text-white" style="background:#e83e8c;">P: <?= $p ?></span>
-                                                    <span class="badge bg-success ms-1">Total: <?= $total ?></span>
-                                                </td>
-                                                <td><?= htmlspecialchars($row['alamat']); ?></td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
+                                <!-- Tabel untuk non-admin tetap -->
                             <?php endif; ?>
                         </div>
                     </div>
@@ -202,7 +206,6 @@ function applyFilters() {
     rows.forEach(row => {
         if (row.id === 'noResults') return;
 
-        const rowText = row.textContent.toLowerCase();
         const asalSekolahCell = row.cells[4];
         const kelasCell = row.cells[5];
         const inklusiCell = row.cells[6];
@@ -215,14 +218,16 @@ function applyFilters() {
         }
 
         const kelas = kelasCell ? kelasCell.textContent.trim() : '';
-        const jenisInklusi = inklusiCell ? inklusiCell.textContent.trim().toLowerCase() : '';
         const jkBadge = jkCell ? jkCell.textContent.trim() : '';
+        const kodeInklusi = inklusiCell ? inklusiCell.getAttribute('data-kode').toLowerCase() : '';
+
+        const rowText = row.textContent.toLowerCase();
 
         const matchesSearch = rowText.includes(searchTerm);
         const matchesJenjang = jenjangValue === '' || jenjang === jenjangValue;
         const matchesKelas = kelasValue === '' || kelas.toLowerCase().includes(kelasValue.toLowerCase());
         const matchesJK = jkValue === '' || jkBadge === jkValue;
-        const matchesInklusi = inklusiValue === '' || jenisInklusi.includes(inklusiValue);
+        const matchesInklusi = inklusiValue === '' || kodeInklusi === inklusiValue;
 
         if (matchesSearch && matchesJenjang && matchesKelas && matchesJK && matchesInklusi) {
             row.style.display = '';
@@ -267,13 +272,10 @@ function updateKelasOptions(jenjang) {
     }
 }
 
-setTimeout(function () {
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        if (alert.classList.contains('show')) {
-            alert.classList.remove('show');
-            alert.classList.add('fade');
-        }
+setTimeout(() => {
+    document.querySelectorAll('.alert.show').forEach(alert => {
+        alert.classList.remove('show');
+        alert.classList.add('fade');
     });
 }, 5000);
 </script>

@@ -67,7 +67,17 @@ function getJenjangText($jenjang)
 $siswa_l = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM data_siswa WHERE sekolah_id = $id AND jenis_kelamin = 'L'"));
 $siswa_p = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM data_siswa WHERE sekolah_id = $id AND jenis_kelamin = 'P'"));
 $totalSiswa = $siswa_l + $siswa_p;
-$isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus']);
+
+// Hak akses edit detail & siswa
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+$isPengurus = isset($_SESSION['role']) && $_SESSION['role'] === 'pengurus';
+$user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['sekolah_id'] : null;
+$canEdit = false;
+if ($isAdmin) {
+    $canEdit = true;
+} elseif ($isPengurus && intval($user_sekolah_id) === intval($sekolah['id'])) {
+    $canEdit = true;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -297,7 +307,7 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                 <a href="../kategori_data/data_sekolah_inklusi.php" class="back-btn">
                     <i class="fas fa-arrow-left me-2"></i> Kembali ke Data Sekolah
                 </a>
-                <?php if ($isAdminOrPengurus): ?>
+                <?php if ($canEdit): ?>
                     <a href="edit-detail.php?id=<?= $sekolah['id']; ?>" class="edit-btn me-2">Edit Detail</a>
                 <?php endif; ?>
             </div>
@@ -466,8 +476,8 @@ $isAdminOrPengurus = isset($_SESSION['role']) && in_array($_SESSION['role'], ['a
                     </div>
                 </div>
 
-                <!-- Data Siswa (Hanya untuk admin/pengurus) -->
-                <?php if ($isAdminOrPengurus): ?>
+                <!-- Data Siswa (Hanya untuk admin/pengurus yang berhak) -->
+                <?php if ($canEdit): ?>
                 <div class="students-table">
                     <div class="section-card">
                         <div class="section-header d-flex justify-content-between align-items-center">
