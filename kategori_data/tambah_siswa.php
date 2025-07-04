@@ -140,11 +140,16 @@ function updateKelasOptions() {
     const selected = sekolahSelect.options[sekolahSelect.selectedIndex];
     const jenjang = selected ? selected.getAttribute('data-jenjang') : '';
     let kelasOptions = '<option value="">-- Pilih Kelas --</option>';
-    if (jenjang === 'SD') {
+    if (jenjang === 'PAUD') {
+        kelasOptions += `<option value="PAUD">PAUD</option>`;
+    } else if (jenjang === 'TK') {
+        kelasOptions += `<option value="TK A">TK A</option>`;
+        kelasOptions += `<option value="TK B">TK B</option>`;
+    } else if (jenjang === 'SD') {
         for (let i = 1; i <= 6; i++) {
             kelasOptions += `<option value="${i}">${i}</option>`;
         }
-    } else if (jenjang === 'SMP' || jenjang === 'SMA' || jenjang === 'SMK') {
+    } else if (jenjang === 'SMP') {
         for (let i = 1; i <= 3; i++) {
             kelasOptions += `<option value="${i}">${i}</option>`;
         }

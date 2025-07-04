@@ -38,10 +38,10 @@ $user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['se
                         <div class="filter-section">
                             <select class="filter-select" id="jenjangFilter">
                                 <option value="">Semua Jenjang</option>
+                                <option value="PAUD">PAUD</option>
+                                <option value="TK">TK </option>
                                 <option value="SD">SD</option>
                                 <option value="SMP">SMP</option>
-                                <option value="SMA">SMA</option>
-                                <option value="SMK">SMK</option>
                             </select>
                         </div>
                     </div>
@@ -187,10 +187,13 @@ $user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['se
                                                 onclick="return confirm('Anda yakin ingin mengedit data ini?')">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn-delete" title="Hapus"
-                                                onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
+                                            
+                                            <?php if ($isAdmin): ?>
+                                                <a href="hapus_sekolah_inklusi.php?id=<?= $row['id']; ?>" class="btn-delete" title="Hapus"
+                                                    onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            <?php endif; ?>
                                         </div>
                                     <?php endif; ?>
                                 </div>

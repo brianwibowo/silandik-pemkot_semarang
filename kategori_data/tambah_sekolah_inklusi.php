@@ -7,7 +7,6 @@ include '../partials/head.php';
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
     header("Location: index.php"); exit;
 }
-
 ?>
 
 <div id="background">
@@ -60,10 +59,10 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'penguru
                                     <label class="form-label required-field" for="jenjang_sekolah">Jenjang Sekolah</label>
                                     <select name="jenjang_sekolah" id="jenjang_sekolah" class="form-control" required>
                                         <option value="">Pilih Jenjang Sekolah</option>
-                                        <option value="SD">SD (Sekolah Dasar)</option>
-                                        <option value="SMP">SMP (Sekolah Menengah Pertama)</option>
-                                        <option value="SMA">SMA (Sekolah Menengah Atas)</option>
-                                        <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
+                                        <option value="PAUD">PAUD</option>
+                                        <option value="TK">TK </option>
+                                        <option value="SD">SD </option>
+                                        <option value="SMP">SMP </option>
                                     </select>
                                     <div class="form-hint">Pilih jenjang pendidikan sekolah</div>
                                 </div>
@@ -337,11 +336,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     document.getElementById('jenjang_sekolah').addEventListener('change', function() {
         const jenjang = this.value;
         const namaSekolahInput = document.getElementById('nama_sekolah');
-        
-        if (jenjang) {
-            namaSekolahInput.placeholder = `Contoh: ${jenjang} Negeri 1 Jakarta`;
-        } else {
+        if (jenjang === 'PAUD') {
+            namaSekolahInput.placeholder = "Contoh: PAUD Mawar";
+        } else if (jenjang === 'TK') {
+            namaSekolahInput.placeholder = "Contoh: TK Bina Anak";
+        } else if (jenjang === 'SD') {
             namaSekolahInput.placeholder = "Contoh: SD Negeri 1 Jakarta";
+        } else if (jenjang === 'SMP') {
+            namaSekolahInput.placeholder = "Contoh: SMP Negeri 1 Jakarta";
+        } else {
+            namaSekolahInput.placeholder = "Contoh: Nama Sekolah";
         }
     });
 

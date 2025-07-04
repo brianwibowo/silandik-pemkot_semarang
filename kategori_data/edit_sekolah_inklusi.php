@@ -71,10 +71,10 @@ if (!$sekolah) {
                                     <label class="form-label required-field" for="jenjang_sekolah">Jenjang Sekolah</label>
                                     <select name="jenjang_sekolah" id="jenjang_sekolah" class="form-control" required>
                                         <option value="">Pilih Jenjang Sekolah</option>
-                                        <option value="SD" <?= ($sekolah['jenjang_sekolah'] == 'SD') ? 'selected' : ''; ?>>SD (Sekolah Dasar)</option>
-                                        <option value="SMP" <?= ($sekolah['jenjang_sekolah'] == 'SMP') ? 'selected' : ''; ?>>SMP (Sekolah Menengah Pertama)</option>
-                                        <option value="SMA" <?= ($sekolah['jenjang_sekolah'] == 'SMA') ? 'selected' : ''; ?>>SMA (Sekolah Menengah Atas)</option>
-                                        <option value="SMK" <?= ($sekolah['jenjang_sekolah'] == 'SMK') ? 'selected' : ''; ?>>SMK (Sekolah Menengah Kejuruan)</option>
+                                        <option value="SD" <?= ($sekolah['jenjang_sekolah'] == 'PAUD') ? 'selected' : ''; ?>>PAUD (Pendidikan Anak Usia Dini)</option>
+                                        <option value="SMP" <?= ($sekolah['jenjang_sekolah'] == 'TK') ? 'selected' : ''; ?>>TK (Taman Kanak-Kanak)</option>
+                                        <option value="SMA" <?= ($sekolah['jenjang_sekolah'] == 'SD') ? 'selected' : ''; ?>>SD (Sekolah Dasar)</option>
+                                        <option value="SMK" <?= ($sekolah['jenjang_sekolah'] == 'SMP') ? 'selected' : ''; ?>>SMP (Sekolah Menengah Pertama)</option>
                                     </select>
                                     <div class="form-hint">Pilih jenjang pendidikan sekolah</div>
                                 </div>

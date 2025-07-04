@@ -8,17 +8,18 @@ $error = "";
 $showSuccess = false; // flag untuk trigger SweetAlert sukses
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE email = '$email'";
+    $query = "SELECT * FROM users WHERE username = '$username'";
     $result = mysqli_query($conn, $query);
 
     if ($result && mysqli_num_rows($result) === 1) {
         $user = mysqli_fetch_assoc($result);
 
+        // Perbaikan: gunakan $user bukan $username untuk mengakses data dari database
         if (password_verify($password, $user['password']) || $password === $user['password']) {
-            $_SESSION['email'] = $user['email'];
+            $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             // Set session sekolah_id jika role pengurus
             if ($user['role'] === 'pengurus' && isset($user['sekolah_id'])) {
@@ -31,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $error = "Password salah!";
         }
     } else {
-        $error = "Email tidak ditemukan!";
+        $error = "Username tidak ditemukan!";
     }
 }
 ?>
@@ -60,8 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="card-body">
                         <form method="POST" action="">
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="inputEmail" name="email" type="email" placeholder="name@example.com" required />
-                                <label for="inputEmail">Email address</label>
+                                <input class="form-control" id="inputUsername" name="username" type="text" placeholder="Username" required />
+                                <label for="inputUsername">Username</label>
                             </div>
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Password" required />

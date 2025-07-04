@@ -33,10 +33,10 @@ include '../koneksi.php';
                             <div class="filter-section">
                                 <select class="filter-select" id="jenjangFilter">
                                     <option value="">Semua Jenjang</option>
-                                    <option value="SD">SD</option>
-                                    <option value="SMP">SMP</option>
-                                    <option value="SMA">SMA</option>
-                                    <option value="SMK">SMK</option>
+                                    <option value="PAUD">PAUD</option>
+                                    <option value="TK">TK (TK A dan TK B)</option>
+                                    <option value="SD">SD (Kelas 1-6)</option>
+                                    <option value="SMP">SMP (Kelas 1-3)</option>
                                 </select>
                             </div>
                         </div>
@@ -224,7 +224,7 @@ function applyFilters() {
         const rowText = row.textContent.toLowerCase();
 
         const matchesSearch = rowText.includes(searchTerm);
-        const matchesJenjang = jenjangValue === '' || jenjang === jenjangValue;
+        const matchesJenjang = jenjangValue === '' || jenjang === jenjangValue || (jenjangValue === 'TK' && jenjang.startsWith('TK'));
         const matchesKelas = kelasValue === '' || kelas.toLowerCase().includes(kelasValue.toLowerCase());
         const matchesJK = jkValue === '' || jkBadge === jkValue;
         const matchesInklusi = inklusiValue === '' || kodeInklusi === inklusiValue;
@@ -260,15 +260,19 @@ function updateKelasOptions(jenjang) {
     const kelasFilter = document.getElementById('kelasFilter');
     kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
 
-    let maxKelas = 0;
-    if (jenjang === 'SD') maxKelas = 6;
-    else if (['SMP', 'SMA', 'SMK'].includes(jenjang)) maxKelas = 3;
-
-    for (let i = 1; i <= maxKelas; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `Kelas ${i}`;
-        kelasFilter.appendChild(option);
+    if (jenjang === 'PAUD') {
+        kelasFilter.innerHTML += '<option value="PAUD">PAUD</option>';
+    } else if (jenjang === 'TK') {
+        kelasFilter.innerHTML += '<option value="TK A">TK A</option>';
+        kelasFilter.innerHTML += '<option value="TK B">TK B</option>';
+    } else if (jenjang === 'SD') {
+        for (let i = 1; i <= 6; i++) {
+            kelasFilter.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+    } else if (jenjang === 'SMP') {
+        for (let i = 1; i <= 3; i++) {
+            kelasFilter.innerHTML += `<option value="${i}">${i}</option>`;
+        }
     }
 }
 
@@ -278,5 +282,10 @@ setTimeout(() => {
         alert.classList.add('fade');
     });
 }, 5000);
+
+// Inisialisasi kelas filter saat load
+window.addEventListener('DOMContentLoaded', function() {
+    updateKelasOptions(document.getElementById('jenjangFilter').value);
+});
 </script>
 </html>

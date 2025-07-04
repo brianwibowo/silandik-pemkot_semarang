@@ -8,13 +8,18 @@ if (!isset($conn)) {
 
 // Cek status request pengurus untuk user yang login
 $has_pending_request = false;
-if (isset($_SESSION['email']) && isset($_SESSION['role']) && $_SESSION['role'] === 'umum') {
-    $user_email = $_SESSION['email'];
-    $check_request = mysqli_query($conn, "SELECT request_pengurus FROM users WHERE email='$user_email'");
+$user_username = '';
+if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'] === 'umum') {
+    $username = $_SESSION['username'];
+    $check_request = mysqli_query($conn, "SELECT request_pengurus FROM users WHERE username='$username'");
     if ($check_request && mysqli_num_rows($check_request) === 1) {
         $user_data = mysqli_fetch_assoc($check_request);
         $has_pending_request = ($user_data['request_pengurus'] == 1);
     }
+    $user_username = $username;
+} elseif (isset($_SESSION['username']) && isset($_SESSION['role'])) {
+    // Untuk role admin dan pengurus, ambil username dari session
+    $user_username = $_SESSION['username'];
 }
 ?>
 
@@ -105,14 +110,14 @@ if (isset($_SESSION['email']) && isset($_SESSION['role']) && $_SESSION['role'] =
                 <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] === 'umum') : ?>
                     <?php if ($has_pending_request) : ?>
                         <!-- Jika sudah ada pending request -->
-                        <span class="btn btn-outline-warning disabled" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Permintaan Anda sedang menunggu persetujuan admin">
-                            <i class="fas fa-clock"></i> Request Pending
+                        <span class="btn btn-outline-warning btn-sm disabled" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Permintaan Anda sedang menunggu persetujuan admin">
+                            <i class="fas fa-clock"></i> Pending
                         </span>
                     <?php else : ?>
                         <!-- Jika belum ada request -->
                         <form action="/authentification/request_pengurus.php" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-outline-success">
-                                <i class="fas fa-user-plus"></i> Request Pengurus
+                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-user-plus"></i> Request
                             </button>
                         </form>
                     <?php endif; ?>
@@ -142,13 +147,16 @@ if (isset($_SESSION['email']) && isset($_SESSION['role']) && $_SESSION['role'] =
                 ?>
                 <div class="navbar-text d-flex align-items-center gap-2">
                     <div class="admin-avatar <?= $roleColor ?>" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:bold;position:relative;" 
-                         data-bs-toggle="tooltip" data-bs-placement="bottom" title="<?= $roleLabel ?>">
-                        <?= strtoupper(substr($role,0,1)) ?>
+                         data-bs-toggle="tooltip" data-bs-placement="bottom" title="<?= $user_username ?> (<?= $roleLabel ?>)">
+                        <?= strtoupper(substr($user_username ?: $role, 0, 1)) ?>
                         <?php if ($has_pending_request) : ?>
                             <span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#ffc107;border-radius:50%;"></span>
                         <?php endif; ?>
                     </div>
-                    <span><?= $roleLabel ?></span>
+                    <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1;">
+                        <span style="font-weight:bold;font-size:0.9rem;"><?= htmlspecialchars($user_username ?: 'User') ?></span>
+                        <small style="color:#6c757d;font-size:0.75rem;"><?= $roleLabel ?></small>
+                    </div>
                 </div>
                     <a href="/authentification/logout.php" class="btn-logout">
                         <i class="fas fa-sign-out-alt"></i> Logout
