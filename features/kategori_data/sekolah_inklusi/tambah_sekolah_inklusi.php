@@ -1,8 +1,8 @@
 <?php
 session_start();
-include '../config.php';
-include '../koneksi.php';
-include '../partials/head.php';
+include '../../../config.php';
+include '../../../koneksi.php';
+include '../../../partials/head.php';
 
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
     header("Location: index.php"); exit;
@@ -12,7 +12,7 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'penguru
 <div id="background">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php include '../sidebar.php'; ?>
+<?php include '../../../partials/sidebar.php'; ?>
 
 <div id="layoutSidenav">
     <div id="layoutSidenav_content">
@@ -281,7 +281,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<?php include '../partials/footer.php'; ?>
+<?php include '../../../partials/footer.php'; ?>
 
 <script>
     // Preview image function

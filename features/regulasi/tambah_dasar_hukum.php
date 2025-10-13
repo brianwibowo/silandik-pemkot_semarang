@@ -3,13 +3,17 @@ session_start();
 include '../../config.php';
 include '../../partials/head.php';
 include '../../koneksi.php';
+?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    $_SESSION['error_message'] = "Anda tidak memiliki akses untuk menambah regulasi.";
     header("Location: dasar_hukum.php");
     exit;
 }
 
-$success = $error = "";
+$error = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nomor_regulasi = trim($_POST['nomor_regulasi']);
@@ -25,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (in_array($fileExt, $allowed)) {
             $newName = uniqid('regulasi_', true) . '.' . $fileExt;
-            $dest = "../../../pdfs" . $newName;
+            $dest = "../../pdfs/" . $newName;
             if (move_uploaded_file($fileTmp, $dest)) {
                 $draft_hukum = $newName;
             } else {
@@ -40,11 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = mysqli_prepare($conn, "INSERT INTO dasar_hukum (nomor_regulasi, tentang, draft_hukum) VALUES (?, ?, ?)");
         mysqli_stmt_bind_param($stmt, "sss", $nomor_regulasi, $tentang, $draft_hukum);
         if (mysqli_stmt_execute($stmt)) {
-            $success = "Regulasi berhasil ditambahkan.";
-            header("Location: dasar_hukum.php?success=add");
+            $_SESSION['success_message'] = "Regulasi berhasil ditambahkan.";
+            header("Location: dasar_hukum.php");
             exit;
         } else {
-            $error = "Gagal menambah regulasi.";
+            $error = "Gagal menambah regulasi: " . mysqli_error($conn);
         }
         mysqli_stmt_close($stmt);
     }
@@ -63,8 +67,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="fas fa-plus me-1"></i> Form Tambah Regulasi
                         </div>
                         <div class="card-body">
-                            <?php if ($error): ?>
-                                <div class="alert alert-danger"><?= $error ?></div>
+                                                    <?php if ($error): ?>
+                                <script>
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: '<?= str_replace("'", "\'", $error) ?>',
+                                        icon: 'error',
+                                        confirmButtonColor: '#dc3545'
+                                    });
+                                </script>
                             <?php endif; ?>
                             <form method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">

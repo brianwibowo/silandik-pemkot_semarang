@@ -1,13 +1,13 @@
 <?php
 session_start();
-include '../config.php';
-include '../partials/head.php';
-include '../koneksi.php';
-include '../sidebar.php';
+include '../../../config.php';
+include '../../../partials/head.php';
+include '../../../koneksi.php';
+include '../../../partials/sidebar.php';
 
 // Ubah: pengurus juga boleh akses
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header("Location: ../index.php");
+    header("Location: ../../../index.php");
     exit;
 }
 

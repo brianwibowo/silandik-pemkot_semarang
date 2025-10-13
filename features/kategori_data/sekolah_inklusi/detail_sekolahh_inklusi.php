@@ -1,9 +1,9 @@
 <?php
 session_start();
-include '../config.php';
-include '../partials/head.php';
-include '../koneksi.php';
-include '../sidebar.php';
+include '../../../config.php';
+include '../../../partials/head.php';
+include '../../../koneksi.php';
+include '../../../partials/sidebar.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
@@ -14,7 +14,7 @@ if ($id <= 0) {
 // Ambil data sekolah
 $sekolah = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM data_sekolah_inklusi WHERE id = $id"));
 if (!$sekolah) {
-    echo "<script>alert('Data tidak ditemukan'); window.location.href = '../kategori_data/data_sekolah_inklusi.php';</script>";
+    echo "<script>alert('Data tidak ditemukan'); window.location.href = 'data_sekolah_inklusi.php';</script>";
     exit;
 }
 
@@ -304,7 +304,7 @@ if ($isAdmin) {
         <!-- Header -->
         <div class="row align-items-center mb-4">
             <div class="col-md-4 text-start">
-                <a href="../kategori_data/data_sekolah_inklusi.php" class="back-btn">
+                <a href="data_sekolah_inklusi.php" class="back-btn">
                     <i class="fas fa-arrow-left me-2"></i> Kembali ke Data Sekolah
                 </a>
                 <?php if ($canEdit): ?>

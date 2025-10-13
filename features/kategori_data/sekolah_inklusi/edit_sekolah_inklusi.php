@@ -1,11 +1,11 @@
 <?php
 session_start();
-include '../config.php';
-include '../koneksi.php';
-include '../partials/head.php';
+include '../../../config.php';
+include '../../../koneksi.php';
+include '../../../partials/head.php';
 
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header("Location: index.php"); exit;
+    header("Location: ../../../index.php"); exit;
 }
 
 
@@ -22,7 +22,7 @@ if (!$sekolah) {
 <div id="background">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php include '../sidebar.php'; ?>
+<?php include '../../../partials/sidebar.php'; ?>
 
 <div id="layoutSidenav">
     <div id="layoutSidenav_content">
@@ -71,10 +71,10 @@ if (!$sekolah) {
                                     <label class="form-label required-field" for="jenjang_sekolah">Jenjang Sekolah</label>
                                     <select name="jenjang_sekolah" id="jenjang_sekolah" class="form-control" required>
                                         <option value="">Pilih Jenjang Sekolah</option>
-                                        <option value="SD" <?= ($sekolah['jenjang_sekolah'] == 'PAUD') ? 'selected' : ''; ?>>PAUD (Pendidikan Anak Usia Dini)</option>
-                                        <option value="SMP" <?= ($sekolah['jenjang_sekolah'] == 'TK') ? 'selected' : ''; ?>>TK (Taman Kanak-Kanak)</option>
-                                        <option value="SMA" <?= ($sekolah['jenjang_sekolah'] == 'SD') ? 'selected' : ''; ?>>SD (Sekolah Dasar)</option>
-                                        <option value="SMK" <?= ($sekolah['jenjang_sekolah'] == 'SMP') ? 'selected' : ''; ?>>SMP (Sekolah Menengah Pertama)</option>
+                                        <option value="PAUD" <?= ($sekolah['jenjang_sekolah'] == 'PAUD') ? 'selected' : ''; ?>>PAUD (Pendidikan Anak Usia Dini)</option>
+                                        <option value="TK" <?= ($sekolah['jenjang_sekolah'] == 'TK') ? 'selected' : ''; ?>>TK (Taman Kanak-Kanak)</option>
+                                        <option value="SD" <?= ($sekolah['jenjang_sekolah'] == 'SD') ? 'selected' : ''; ?>>SD (Sekolah Dasar)</option>
+                                        <option value="SMP" <?= ($sekolah['jenjang_sekolah'] == 'SMP') ? 'selected' : ''; ?>>SMP (Sekolah Menengah Pertama)</option>
                                     </select>
                                     <div class="form-hint">Pilih jenjang pendidikan sekolah</div>
                                 </div>
@@ -329,7 +329,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<?php include '../partials/footer.php'; ?>
+<?php include '../../../partials/footer.php'; ?>
 
 <script>
     // Preview image function

@@ -7,19 +7,27 @@ include '../../koneksi.php';
 // Ambil semua regulasi
 $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
 
-// Tampilkan pesan sukses jika ada
-if (isset($_SESSION['success_message'])) {
+// Tampilkan pesan sukses atau error jika ada
+if (isset($_SESSION['success_message']) || isset($_SESSION['error_message'])) {
+    $message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : $_SESSION['error_message'];
+    $icon = isset($_SESSION['success_message']) ? 'success' : 'error';
+    $title = isset($_SESSION['success_message']) ? 'Berhasil!' : 'Error!';
+    $buttonColor = isset($_SESSION['success_message']) ? '#198754' : '#dc3545';
+    
     echo "<script>
         document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({
-                title: 'Berhasil!',
-                text: 'Regulasi berhasil diperbarui.',
-                icon: 'success',
-                confirmButtonColor: '#198754'
+                title: '" . $title . "',
+                text: '" . str_replace("'", "\'", $message) . "',
+                icon: '" . $icon . "',
+                confirmButtonColor: '" . $buttonColor . "'
             });
         });
     </script>";
+    
+    // Clear session messages
     unset($_SESSION['success_message']);
+    unset($_SESSION['error_message']);
 }
 ?>
 
@@ -78,12 +86,14 @@ if (isset($_SESSION['success_message'])) {
                                             </td>
                                             <td class="text-center">
                                                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                                    <a href="edit_dasar_hukum.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning mb-1">
+                                                    <a href="edit_dasar_hukum.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning mb-1" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <a href="hapus_dasar_hukum.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin ingin menghapus regulasi ini?')">
+                                                    <button type="button" class="btn btn-sm btn-danger mb-1" 
+                                                            onclick="konfirmasiHapus(<?= $row['id'] ?>, '<?= htmlspecialchars($row['nomor_regulasi'], ENT_QUOTES) ?>')" 
+                                                            title="Hapus">
                                                         <i class="fas fa-trash"></i>
-                                                    </a>
+                                                    </button>
                                                 <?php endif; ?>
                                                 <?php if ($namaFile): ?>
                                                     <a href="../../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-info mb-1" target="_blank">
@@ -103,5 +113,23 @@ if (isset($_SESSION['success_message'])) {
         </div>
     </div>
     <?php include '../../partials/footer.php'; ?>
+    <script>
+        function konfirmasiHapus(id, nomor) {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: `Yakin ingin menghapus regulasi "${nomor}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `hapus_dasar_hukum.php?id=${id}`;
+                }
+            });
+        }
+    </script>
 </body>
 </html>

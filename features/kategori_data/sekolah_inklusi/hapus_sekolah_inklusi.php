@@ -1,10 +1,10 @@
 <?php
 session_start();
-include '../config.php';
-include '../koneksi.php';
+include '../../../config.php';
+include '../../../koneksi.php';
 
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header("Location: index.php"); exit;
+    header("Location: ../../../index.php"); exit;
 }
 
 $id = (int) $_GET ['id'];
