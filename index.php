@@ -79,7 +79,7 @@ function truncateText($text, $length = 100, $suffix = '...') {
 </head>
 <body>
 <div id="background">
-    <?php include 'sidebar.php'; ?>
+    <?php include 'partials/sidebar.php'; ?>
 
     <main>
         <div class="container-fluid px-4">
@@ -107,7 +107,7 @@ function truncateText($text, $length = 100, $suffix = '...') {
                     </select>
 
                     <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus'])) : ?>
-                        <a href="tambah_berita.php" class="btn-add" aria-label="Tambah berita baru">
+                        <a href="features/berita/tambah_berita.php" class="btn-add" aria-label="Tambah berita baru">
                             <i class="fas fa-plus"></i>
                             Tambah Berita
                         </a>
@@ -146,7 +146,7 @@ function truncateText($text, $length = 100, $suffix = '...') {
                                         <i class="fas fa-image"></i>
                                     </div>
                                 <?php endif; ?>
-                                <div class="news-badge sekolah">BERITA</div>
+                                <div class="news-badge sekolah">SEKOLAH</div>
                             </div>
 
                             <div class="news-content">
@@ -162,7 +162,7 @@ function truncateText($text, $length = 100, $suffix = '...') {
                                 <p class="news-excerpt"><?= truncateText($b['isi']) ?></p>
 
                                 <div class="news-actions">
-                                    <a href="detail_berita.php?id=<?= (int)$b['id'] ?>" 
+                                    <a href="features/berita/detail_berita.php?id=<?= (int)$b['id'] ?>" 
                                        class="read-more-btn"
                                        aria-label="Baca selengkapnya: <?= $judulSanitized ?>">
                                         Baca selengkapnya <i class="fas fa-external-link-alt"></i>
@@ -170,13 +170,13 @@ function truncateText($text, $length = 100, $suffix = '...') {
 
                                     <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus'])) : ?>
                                         <div class="admin-actions">
-                                            <a href="edit_berita.php?id=<?= (int)$b['id'] ?>" 
+                                            <a href="features/berita/edit_berita.php?id=<?= (int)$b['id'] ?>" 
                                                class="btn-edit" 
                                                title="Edit berita"
                                                aria-label="Edit berita: <?= $judulSanitized ?>">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="hapus_berita.php?id=<?= (int)$b['id'] ?>" 
+                                            <a href="features/berita/hapus_berita.php?id=<?= (int)$b['id'] ?>" 
                                                class="btn-delete"
                                                onclick="return confirm('Yakin ingin menghapus berita ini?')" 
                                                title="Hapus berita"
@@ -242,7 +242,7 @@ function truncateText($text, $length = 100, $suffix = '...') {
                                         <i class="fas fa-image"></i>
                                     </div>
                                 <?php endif; ?>
-                                <div class="news-badge dinas">BERITA</div>
+                                <div class="news-badge dinas">DINAS</div>
                             </div>
 
                             <div class="news-content">
@@ -258,7 +258,7 @@ function truncateText($text, $length = 100, $suffix = '...') {
                                 <p class="news-excerpt"><?= truncateText($b['isi']) ?></p>
 
                                 <div class="news-actions">
-                                    <a href="detail_berita.php?id=<?= (int)$b['id'] ?>" 
+                                    <a href="features/berita/detail_berita.php?id=<?= (int)$b['id'] ?>" 
                                        class="read-more-btn"
                                        aria-label="Baca selengkapnya: <?= $judulSanitized ?>">
                                         Baca selengkapnya <i class="fas fa-external-link-alt"></i>
@@ -266,13 +266,13 @@ function truncateText($text, $length = 100, $suffix = '...') {
 
                                     <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus'])) : ?>
                                         <div class="admin-actions">
-                                            <a href="edit_berita.php?id=<?= (int)$b['id'] ?>" 
+                                            <a href="features/berita/edit_berita.php?id=<?= (int)$b['id'] ?>" 
                                                class="btn-edit" 
                                                title="Edit berita"
                                                aria-label="Edit berita: <?= $judulSanitized ?>">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="hapus_berita.php?id=<?= (int)$b['id'] ?>" 
+                                            <a href="features/berita/hapus_berita.php?id=<?= (int)$b['id'] ?>" 
                                                class="btn-delete"
                                                onclick="return confirm('Yakin ingin menghapus berita ini?')" 
                                                title="Hapus berita"

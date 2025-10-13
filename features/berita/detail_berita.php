@@ -1,20 +1,20 @@
 <?php
 session_start();
-include 'koneksi.php';
-include 'partials/head.php';
+include '../../koneksi.php';
+include '../../partials/head.php';
 
 // Get news ID from URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
-    header('Location: beranda.php');
+    header('Location: index.php');
     exit;
 }
 
 // Fetch news data
 $query = mysqli_query($conn, "SELECT * FROM berita WHERE id = $id");
 if (!$query || mysqli_num_rows($query) == 0) {
-    header('Location: beranda.php');
+    header('Location: index.php');
     exit;
 }
 
@@ -22,13 +22,13 @@ $berita = mysqli_fetch_assoc($query);
 ?>
 
 <div id="background">
-    <?php include 'sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
 
     <main>
         <div class="container-fluid px-4">
             <!-- Navigation Header -->
             <div class="navigation-header">
-                <a href="index.php" class="back-btn">
+                <a href="../../index.php" class="back-btn">
                     <i class="fas fa-arrow-left"></i>
                     <span>Kembali ke Beranda</span>
                 </a>
@@ -66,9 +66,9 @@ $berita = mysqli_fetch_assoc($query);
                 </header>
 
                 <!-- Article Image -->
-                <?php if (!empty($berita['gambar']) && file_exists("upload/berita/" . $berita['gambar'])): ?>
+                <?php if (!empty($berita['gambar']) && file_exists("../../upload/berita/" . $berita['gambar'])): ?>
                     <div class="article-image-container">
-                        <img src="upload/berita/<?= htmlspecialchars($berita['gambar']) ?>" 
+                        <img src="../../upload/berita/<?= htmlspecialchars($berita['gambar']) ?>" 
                              class="article-image" 
                              alt="<?= htmlspecialchars($berita['judul']) ?>">
                         <div class="image-overlay"></div>
@@ -113,8 +113,8 @@ $berita = mysqli_fetch_assoc($query);
                     ?>
                         <div class="related-news-card">
                             <div class="related-image-container">
-                                <?php if (!empty($related['gambar']) && file_exists("upload/berita/" . $related['gambar'])): ?>
-                                    <img src="upload/berita/<?= htmlspecialchars($related['gambar']) ?>" 
+                                <?php if (!empty($related['gambar']) && file_exists("../../upload/berita/" . $related['gambar'])): ?>
+                                    <img src="../../upload/berita/<?= htmlspecialchars($related['gambar']) ?>" 
                                          class="related-image" 
                                          alt="<?= htmlspecialchars($related['judul']) ?>">
                                 <?php else: ?>
@@ -547,6 +547,6 @@ $berita = mysqli_fetch_assoc($query);
     }
 </style>
 
-<?php include 'partials/footer.php'; ?>
+<?php include '../../partials/footer.php'; ?>
 </body>
 </html>

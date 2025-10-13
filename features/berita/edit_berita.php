@@ -1,17 +1,17 @@
 <?php
 session_start();
-include 'koneksi.php';
+include '../../koneksi.php';
 
 // Penyesuaian: pengurus juga boleh akses edit berita
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header('Location: login.php');
+    header('Location: ../../authentification/login.php');
     exit;
 }
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
-    header('Location: beranda.php');
+    header('Location: ../../index.php');
     exit;
 }
 
@@ -19,7 +19,7 @@ $data = mysqli_query($conn, "SELECT * FROM berita WHERE id = $id");
 $berita = mysqli_fetch_assoc($data);
 
 if (!$berita) {
-    header('Location: beranda.php');
+    header('Location: ../../index.php');
     exit;
 }
 
@@ -46,17 +46,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (in_array($ext, $allowed)) {
                 // Create unique filename
                 $newName = time() . '_' . uniqid() . '.' . $ext;
-                $target = 'upload/berita/' . $newName;
+                $target = '../../upload/berita/' . $newName;
                 
                 // Create directory if not exists
-                if (!is_dir('upload/berita')) {
-                    mkdir('upload/berita', 0755, true);
+                if (!is_dir('../../upload/berita')) {
+                    mkdir('../../upload/berita', 0755, true);
                 }
                 
                 if (move_uploaded_file($tmp, $target)) {
                     // Delete old image if exists and different
-                    if (!empty($berita['gambar']) && $berita['gambar'] != $newName && file_exists('upload/berita/' . $berita['gambar'])) {
-                        unlink('upload/berita/' . $berita['gambar']);
+                    if (!empty($berita['gambar']) && $berita['gambar'] != $newName && file_exists('../../upload/berita/' . $berita['gambar'])) {
+                        unlink('../../upload/berita/' . $berita['gambar']);
                     }
                     $gambarBaru = $newName;
                 } else {
@@ -88,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<?php include 'partials/head.php'; ?>
+<?php include '../../partials/head.php'; ?>
 
 <div id="background">
-    <?php include 'sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
 
     <main>
         <div class="container-fluid px-4">
@@ -184,11 +184,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                accept="image/*">
                         <small class="form-text">Format: JPG, JPEG, PNG, GIF. Maksimal 5MB. Kosongkan jika tidak ingin mengganti.</small>
                         
-                        <?php if (!empty($berita['gambar']) && file_exists('upload/berita/' . $berita['gambar'])): ?>
+                        <?php if (!empty($berita['gambar']) && file_exists('../../upload/berita/' . $berita['gambar'])): ?>
                             <div class="current-image">
                                 <label class="current-image-label">Gambar Saat Ini:</label>
                                 <div class="image-preview">
-                                    <img src="upload/berita/<?= htmlspecialchars($berita['gambar']); ?>" 
+                                    <img src="../../upload/berita/<?= htmlspecialchars($berita['gambar']); ?>" 
                                          alt="Gambar berita saat ini" 
                                          class="preview-img">
                                 </div>
@@ -497,6 +497,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     });
 </script>
 
-<?php include 'partials/footer.php'; ?>
+<?php include '../../partials/footer.php'; ?>
 </body>
 </html>

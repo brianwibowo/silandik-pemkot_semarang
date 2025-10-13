@@ -1,10 +1,10 @@
 <?php
 session_start();
-include 'koneksi.php';
+include '../../koneksi.php';
 
 // Cek role
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header('Location: login.php');
+    header('Location: ../../authentification/login.php');
     exit;
 }
 
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $file_extension = pathinfo($gambar, PATHINFO_EXTENSION);
                     $gambar_name = md5(uniqid(mt_rand(), true)) . '.' . $file_extension;
 
-                    $upload_dir = 'upload/berita/';
+                    $upload_dir = '../../upload/berita/';
                     if (!is_dir($upload_dir)) {
                         mkdir($upload_dir, 0755, true);
                     }
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($stmt->execute()) {
                     $_SESSION['success'] = "Berita berhasil ditambahkan.";
-                    header("Location: index.php");
+                    header("Location: ../../index.php");
                     exit;
                 } else {
                     $error = "Gagal menyimpan berita ke database: " . $conn->error;
@@ -84,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include 'partials/head.php';
-include 'sidebar.php';
+include '../../partials/head.php';
+include '../../partials/sidebar.php';
 ?>
 
 <style>
@@ -108,7 +108,7 @@ include 'sidebar.php';
     }
 </style>
 
-<script src="assets/js/sweetalert2.all.min.js"></script>
+<script src="../../assets/js/sweetalert2.all.min.js"></script>
 <?php if ($error): ?>
 <script>
     Swal.fire({
@@ -175,4 +175,4 @@ include 'sidebar.php';
     </main>
 </div>
 
-<?php include 'partials/footer.php'; ?>
+<?php include '../../partials/footer.php'; ?>
