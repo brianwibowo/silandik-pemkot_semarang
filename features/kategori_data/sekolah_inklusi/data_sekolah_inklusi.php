@@ -12,15 +12,11 @@ $user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['se
 <div id="background">
     <?php include '../../../partials/sidebar.php'; ?>
 
-    <!-- Header Section -->
-    <div class="header-section">
-        <div class="header-container">
-            <div class="header-title">
-                <h1 class="page-title">Data Sekolah Inklusi</h1>
-                <p class="page-subtitle">Kelola informasi sekolah inklusi dengan mudah</p>
-            </div>
+    <div class="container-fluid px-4">
+        <div class="page-header">
+            <h1 class="page-title">Data Sekolah Inklusi</h1>
+            <p class="page-subtitle">Kelola informasi sekolah inklusi dengan mudah</p>
         </div>
-    </div>
 
     <main>
         <div class="container-fluid px-4">
@@ -139,7 +135,7 @@ $user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['se
                         <div class="school-card"
                             data-name="<?= strtolower(htmlspecialchars($row['nama_sekolah'])); ?>"
                             data-desc="<?= strtolower(htmlspecialchars($row['deskripsi'])); ?>"
-                            data-jenjang="<?= htmlspecialchars($row['jenjang_sekolah']); ?>">
+                            data-jenjang="<?= strtoupper(trim($row['jenjang_sekolah'])); ?>">
 
                             <!-- School Image -->
                             <div class="school-image-container">
@@ -291,13 +287,12 @@ $user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['se
     });
 
     document.getElementById('jenjangFilter').addEventListener('change', function() {
-        const filterValue = this.value;
+        const filterValue = this.value.toUpperCase().trim();
         const cards = document.querySelectorAll('.school-card');
         let visibleCount = 0;
 
         cards.forEach(card => {
-            const jenjang = card.getAttribute('data-jenjang');
-
+            const jenjang = card.getAttribute('data-jenjang').toUpperCase().trim();
             if (filterValue === '' || jenjang === filterValue) {
                 card.style.display = 'block';
                 visibleCount++;

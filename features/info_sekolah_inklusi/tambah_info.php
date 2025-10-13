@@ -1,12 +1,12 @@
 <?php
 session_start();
-include '../config.php';
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../config.php';
+include '../../partials/head.php';
+include '../../koneksi.php';
 
 // Akses khusus admin atau pengurus
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header('Location: login.php');
+    header('Location: ../../authentification/login.php');
     exit;
 }
 
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tmp = $_FILES['foto']['tmp_name'];
             $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
             $namaFile = uniqid() . '_' . time() . '.' . $ext;
-            $target = '../uploads/' . $namaFile;
+            $target = '../../upload/info_sekolah/' . $namaFile;
 
             if (move_uploaded_file($tmp, $target)) {
                 $foto = $namaFile;
@@ -38,9 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO info_sekolah_inklusi (sekolah_id, nama_kegiatan, foto, tanggal) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("isss", $sekolah_id, $nama_kegiatan, $foto, $tanggal);
             if ($stmt->execute()) {
-                $success = "Informasi berhasil ditambahkan.";
+                $_SESSION['flash_message'] = 'success_add';
+                header('Location: informasi_sekolah_inklusi.php');
+                exit;
             } else {
-                $error = "Gagal menyimpan ke database: " . $conn->error;
+                $_SESSION['flash_message'] = 'error_add';
+                header('Location: informasi_sekolah_inklusi.php');
+                exit;
             }
         }
     }
@@ -51,7 +55,7 @@ $sekolahList = mysqli_query($conn, "SELECT id, nama_sekolah FROM data_sekolah_in
 ?>
 
 <body>
-    <?php include '../sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
@@ -101,7 +105,7 @@ $sekolahList = mysqli_query($conn, "SELECT id, nama_sekolah FROM data_sekolah_in
             </main>
         </div>
     </div>
-    <?php include '../partials/footer.php'; ?>
+    <?php include '../../partials/footer.php'; ?>
 </body>
 </html>
 

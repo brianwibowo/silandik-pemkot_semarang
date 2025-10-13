@@ -1,14 +1,14 @@
 <?php
 session_start();
-include '../config.php';
+include '../../config.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../index.php");
     exit;
 }
 
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../partials/head.php';
+include '../../koneksi.php';
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -24,7 +24,7 @@ include '../koneksi.php';
     </nav>
 
     <div id="layoutSidenav">
-        <?php include '../sidebar.php'; ?>
+        <?php include '../../partials/sidebar.php'; ?>
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">

@@ -83,7 +83,10 @@ function truncateText($text, $length = 100, $suffix = '...') {
 
     <main>
         <div class="container-fluid px-4">
-            <h1 class="mt-4">Beranda</h1>
+            <div class="page-header">
+                <h1 class="page-title">Beranda</h1>
+                <p class="page-subtitle">Portal informasi sekolah inklusi Kota Semarang</p>
+            </div>
 
             <!-- Search & Filter Section -->
             <div class="search-filter-section">
@@ -322,8 +325,8 @@ function truncateText($text, $length = 100, $suffix = '...') {
                     ?>
                         <article class="news-card">
                             <div class="news-image-container">
-                                <?php if (!empty($k['foto']) && file_exists("uploads/" . $k['foto'])): ?>
-                                    <img src="uploads/<?= sanitizeOutput($k['foto']) ?>" 
+                                <?php if (!empty($k['foto']) && file_exists("upload/info_sekolah/" . $k['foto'])): ?>
+                                    <img src="upload/info_sekolah/<?= sanitizeOutput($k['foto']) ?>" 
                                          loading="lazy" 
                                          class="news-image" 
                                          alt="<?= $namaKegiatanSanitized ?>" 

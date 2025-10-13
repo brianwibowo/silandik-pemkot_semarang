@@ -1,30 +1,21 @@
 <?php
 session_start();
-include '../config.php';
+include '../../config.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: " . $base_url . "index.php");
     exit;
 }
 
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../partials/head.php';
+include '../../koneksi.php';
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<body class="sb-nav-fixed">
-    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand ps-3" href="<?= $base_url ?>index.php">
-            <img src="<?= $base_url ?>../assets/logo_dinas.png" alt="Logo" width="50" height="40"> SILANDIK
-        </a>
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-    </nav>
-
+<body>
+    <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
-        <?php include '../sidebar.php'; ?>
 
         <div id="layoutSidenav_content">
             <main>
@@ -33,7 +24,7 @@ include '../koneksi.php';
 
                     <?php
                     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                        $targetDir = __DIR__ . '/../pdfs/';
+                        $targetDir = __DIR__ . '../../pdfs/';
                         $fileType = strtolower(pathinfo($_FILES["draft"]["name"], PATHINFO_EXTENSION));
                         $fileName = basename($_FILES["draft"]["name"]);
                         $targetFile = $targetDir . $fileName;
@@ -70,7 +61,7 @@ include '../koneksi.php';
                                         confirmButtonColor: '#198754',
                                         confirmButtonText: 'OK'
                                     }).then(() => {
-                                        window.location.href = '{$base_url}dokumen_kurikulum/dokumen_kurikulum_inklusi.php';
+                                        window.location.href = '{$base_url}dokumen_kurikulum_inklusi.php';
                                     });
                                 </script>";
                             } else {
@@ -94,7 +85,7 @@ include '../koneksi.php';
                                     <input type="file" name="draft" class="form-control" accept="application/pdf" required>
                                 </div>
                                 <button type="submit" class="btn btn-warning"><i class="fas fa-upload"></i> Upload Draft Baru</button>
-                                <a href="<?= $base_url ?>dokumen_kurikulum/dokumen_kurikulum_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                                <a href="dokumen_kurikulum_inklusi.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                             </form>
                         </div>
                     </div>
@@ -103,6 +94,6 @@ include '../koneksi.php';
         </div>
     </div>
 
-    <?php include '../partials/footer.php'; ?>
+    <?php include '../../partials/footer.php'; ?>
 </body>
 </html>

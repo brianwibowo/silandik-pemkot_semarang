@@ -1,12 +1,12 @@
 <?php
 session_start();
-include '../config.php';
+include '../../../config.php';
 // Pengurus juga boleh akses hapus
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
     header("Location: index.php");
     exit;
 }
-include '../koneksi.php';
+include '../../../koneksi.php';
 ?>
 
 <?php

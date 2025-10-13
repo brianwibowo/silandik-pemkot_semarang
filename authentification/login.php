@@ -43,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="utf-8" />
     <title>Login - Silandik</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -52,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="row justify-content-center">
             <div class="col-lg-5">
                 <div class="text-center mb-3">
-                    <img src="<?= $base_url ?>assets/logo_dinas.png" alt="Logo" width="60" height="40">
+                    <img src="../assets/logo_dinas.png" alt="Logo" width="180" height="120">
                 </div>
                 <div class="card shadow-lg">
                     <div class="card-header bg-primary text-white text-center">

@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="page-subtitle">Perbarui data tambahan untuk sekolah ini.</p>
     </div>
 
-    <a href="tambah_siswa.php?sekolah_id=<?= $sekolah_id ?>" class="btn btn-success mb-3">
+    <a href="../siswa/tambah_siswa.php?sekolah_id=<?= $sekolah_id ?>" class="btn btn-success mb-3">
         <i class="fas fa-plus"></i> Tambah Siswa
     </a>
 

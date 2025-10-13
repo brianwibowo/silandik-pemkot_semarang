@@ -1,19 +1,19 @@
 <?php
 session_start();
-include '../config.php';
+include '../../../config.php';
 
 // Ubah: pengurus juga boleh akses
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header("Location: ../index.php");
+    header("Location: ../../../index.php");
     exit;
 }
 
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../../partials/head.php';
+include '../../../koneksi.php';
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php include '../sidebar.php'; ?>
+<?php include '../../../partials/sidebar.php'; ?>
 
 <div id="layoutSidenav">
     <div id="layoutSidenav_content">
@@ -190,6 +190,6 @@ include '../koneksi.php';
     </div>
 </div>
 
-<?php include '../partials/footer.php'; ?>
+<?php include '../../../partials/footer.php'; ?>
 </body>
 </html>

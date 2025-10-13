@@ -1,12 +1,12 @@
 <?php
 session_start();
-include '../config.php';
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../../config.php';
+include '../../../partials/head.php';
+include '../../../koneksi.php';
 
 // Ubah: pengurus juga boleh akses
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header("Location: ../index.php");
+    header("Location: ../../../index.php");
     exit;
 }
 
@@ -17,7 +17,7 @@ $sekolah_id = isset($_GET['sekolah_id']) ? (int)$_GET['sekolah_id'] : 0;
 $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah FROM data_sekolah_inklusi ORDER BY nama_sekolah");
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<?php include '../sidebar.php'; ?>
+<?php include '../../../partials/sidebar.php'; ?>
 
 <div id="layoutSidenav">
     <div id="layoutSidenav_content">
@@ -54,7 +54,7 @@ $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah 
                                         confirmButtonColor: '#198754',
                                         confirmButtonText: 'OK'
                                     }).then(() => {
-                                        window.location.href = 'detail_sekolahh_inklusi.php?id=$sekolah_id_post';
+                                        window.location.href = 'data_siswa.php?id=$sekolah_id_post';
                                     });
                                 </script>";
                                 exit;
@@ -124,7 +124,7 @@ $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah 
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Tambah</button>
-                            <a href="detail_sekolahh_inklusi.php?id=<?= $sekolah_id ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
+                            <a href="data_siswa.php?id=<?= $sekolah_id ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Batal</a>
                         </form>
                     </div>
                 </div>
@@ -132,7 +132,7 @@ $daftar_sekolah = mysqli_query($conn, "SELECT id, nama_sekolah, jenjang_sekolah 
         </main>
     </div>
 </div>
-<?php include '../partials/footer.php'; ?>
+<?php include '../../../partials/footer.php'; ?>
 <script>
 function updateKelasOptions() {
     const sekolahSelect = document.getElementById('sekolah_id');

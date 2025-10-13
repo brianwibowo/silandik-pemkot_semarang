@@ -1,7 +1,7 @@
 <?php
 session_start();
-include '../config.php';
-include '../koneksi.php';
+include '../../config.php';
+include '../../koneksi.php';
 
 $isAdmin = isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'pengurus']);
 
@@ -37,14 +37,71 @@ $query = mysqli_query($conn, "
     LIMIT $limit OFFSET $offset
 ");
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <?php include '../partials/head.php'; ?>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php include '../../partials/head.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Informasi Sekolah Inklusi</title>
+    
+    <?php
+    // Notifikasi handling
+    if (isset($_SESSION['flash_message'])) {
+        $message = '';
+        $icon = '';
+        
+        switch ($_SESSION['flash_message']) {
+            case 'success_add':
+                $message = 'Data berhasil ditambahkan!';
+                $icon = 'success';
+                break;
+            case 'success_edit':
+                $message = 'Data berhasil diperbarui!';
+                $icon = 'success';
+                break;
+            case 'success_delete':
+                $message = 'Data berhasil dihapus!';
+                $icon = 'success';
+                break;
+            case 'error_add':
+                $message = 'Gagal menambahkan data!';
+                $icon = 'error';
+                break;
+            case 'error_edit':
+                $message = 'Gagal memperbarui data!';
+                $icon = 'error';
+                break;
+            case 'error_delete':
+                $message = 'Gagal menghapus data!';
+                $icon = 'error';
+                break;
+        }
+        
+        if ($message && $icon) {
+            echo "
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Notifikasi',
+                        text: '$message',
+                        icon: '$icon',
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    });
+                });
+            </script>";
+        }
+        
+        unset($_SESSION['flash_message']);
+    }
+    ?>
     <style>
+        body{
+            background-color: whitesmoke;
+        }
         .activity-card {
             border: none;
             border-radius: 1rem;
@@ -91,41 +148,119 @@ $query = mysqli_query($conn, "
         }
 
         .admin-section {
-            background: #f8f9fa;
-            border-radius: 1rem;
-            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 0;
             margin-top: 3rem;
-            border: 1px solid #e9ecef;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(0,0,0,.08);
+        }
+
+        .admin-section .section-header {
+            background: white;
+            border-bottom: 1px solid rgba(0,0,0,.05);
+            padding: 1.2rem 1.5rem;
+        }
+
+        .table-responsive {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(0,0,0,.08);
+            overflow: hidden;
+            margin: 0;
         }
 
         .admin-table {
+            margin-bottom: 0;
             background: white;
-            border-radius: 0.8rem;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .admin-table thead {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
+        .admin-table > thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
         }
 
-        .admin-table th {
+        .admin-table > thead th {
+            border: none !important;
             font-weight: 600;
-            border: none;
-            padding: 1rem;
-        }
-
-        .admin-table td {
-            padding: 1rem;
-            border-color: #f1f5f9;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 1.2rem 1rem;
+            color: #495057;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to bottom, #f8f9fa, #f1f3f5);
             vertical-align: middle;
         }
 
-        .btn-action {
-            margin: 0 0.2rem;
-            border-radius: 0.5rem;
-            padding: 0.4rem 0.8rem;
+        .admin-table > tbody > tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.2s ease;
+        }
+
+        .admin-table > tbody > tr:hover {
+            background-color: rgba(70, 128, 255, 0.05) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,.02);
+        }
+
+        .admin-table > tbody > tr > td {
+            padding: 1rem;
+            vertical-align: middle;
+            border: none;
+            color: #495057;
+        }
+
+        /* Action Buttons */
+        .action-buttons .btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            margin: 0 0.15rem;
+            transition: all 0.2s ease;
+            position: relative;
+            border: none;
+        }
+
+        .action-buttons .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-buttons .btn-warning {
+            background: #fbbf24;
+            color: #fff;
+        }
+
+        .action-buttons .btn-warning:hover {
+            background: #f59e0b;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        }
+
+        .action-buttons .btn-danger {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .action-buttons .btn-danger:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Add Button */
+        .btn-success {
+            background: #10b981;
+            border-color: #10b981;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            border-color: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(16,185,129,.15);
         }
 
         .pagination-custom {
@@ -201,11 +336,31 @@ $query = mysqli_query($conn, "
             text-align: center;
             padding: 2rem;
         }
+
+        /* Spacing styles */
+        main {
+            min-height: calc(100vh - 60px); /* Memastikan konten minimal setinggi viewport */
+            padding-bottom: 2rem;
+        }
+
+        .bottom-spacing {
+            height: 2rem;
+        }
+
+        /* Memastikan admin section memiliki margin bottom yang cukup */
+        .admin-section {
+            margin-bottom: 3rem;
+        }
+
+        /* Memastikan pagination memiliki margin bottom yang cukup */
+        .pagination-custom {
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
 
 <body>
-    <?php include '../sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
@@ -231,7 +386,7 @@ $query = mysqli_query($conn, "
                                 <div class="col-lg-3 col-md-4 mb-4">
                                     <div class="activity-card h-100">
                                         <?php if ($row['foto']): ?>
-                                            <img src="../uploads/<?= htmlspecialchars($row['foto']) ?>" class="card-img-top" alt="Foto">
+                                            <img src="../../upload/info_sekolah/<?= htmlspecialchars($row['foto']) ?>" class="card-img-top" alt="Foto">
                                         <?php endif; ?>
                                         <div class="card-body">
                                             <h5 class="card-title"><?= htmlspecialchars($row['nama_kegiatan']) ?></h5>
@@ -288,14 +443,16 @@ $query = mysqli_query($conn, "
                     ?>
                     <?php if ($isAdmin): ?>
                         <div class="admin-section">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h4><i class="fas fa-cog me-2 text-primary"></i> Manajemen Data</h4>
-                                <a href="tambah_info.php" class="btn btn-success"><i class="fas fa-plus me-1"></i> Tambah Data</a>
+                            <div class="section-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0"><i class="fas fa-cog me-2" style="color: #4680ff;"></i> Manajemen Data</h4>
+                                <a href="tambah_info.php" class="btn btn-success">
+                                    <i class="fas fa-plus me-1"></i> Tambah Data
+                                </a>
                             </div>
                             <div class="table-responsive">
-                                <table class="table admin-table">
+                                <table class="table table-striped table-hover align-middle admin-table">
                                     <thead>
-                                        <tr>
+                                        <tr class="text-center">
                                             <th>No</th>
                                             <th>Nama Sekolah</th>
                                             <th>Nama Kegiatan</th>
@@ -310,33 +467,110 @@ $query = mysqli_query($conn, "
                                         while ($row = mysqli_fetch_assoc($queryAdmin)):
                                         ?>
                                             <tr>
-                                                <td><?= $no++ ?></td>
+                                                <td class="text-center"><?= $no++ ?></td>
                                                 <td><?= htmlspecialchars($row['nama_sekolah']) ?></td>
                                                 <td><?= htmlspecialchars($row['nama_kegiatan']) ?></td>
-                                                <td>
+                                                <td class="text-center">
                                                     <?php if ($row['foto']): ?>
-                                                        <img src="../uploads/<?= htmlspecialchars($row['foto']) ?>" alt="foto" width="60" height="60" style="object-fit: cover; border-radius: 0.5rem;">
+                                                        <img src="../../upload/info_sekolah/<?= htmlspecialchars($row['foto']) ?>" 
+                                                             alt="foto" 
+                                                             width="60" 
+                                                             height="60" 
+                                                             style="object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                                     <?php else: ?>
-                                                        <span class="badge bg-light text-muted"><i class="fas fa-image me-1"></i>Tidak ada</span>
+                                                        <span class="badge bg-light text-muted">
+                                                            <i class="fas fa-image me-1"></i>Tidak ada
+                                                        </span>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td><span class="badge bg-primary"><?= date('d M Y', strtotime($row['tanggal'])) ?></span></td>
-                                                <td>
-                                                    <a href="edit_info.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning btn-action" title="Edit"><i class="fas fa-edit"></i></a>
-                                                    <a href="hapus_info.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger btn-action" onclick="return confirm('Yakin ingin menghapus data ini?')" title="Hapus"><i class="fas fa-trash"></i></a>
+                                                <td class="text-center">
+                                                    <span class="badge" style="background: #4680ff; font-weight: 500;">
+                                                        <i class="fas fa-calendar-alt me-1"></i>
+                                                        <?= date('d M Y', strtotime($row['tanggal'])) ?>
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="action-buttons d-flex justify-content-center gap-1">
+                                                        <a href="edit_info.php?id=<?= $row['id'] ?>" 
+                                                           class="btn btn-warning btn-sm"
+                                                           data-bs-toggle="tooltip" 
+                                                           data-bs-placement="top" 
+                                                           title="Edit Informasi">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <button type="button"
+                                                                class="btn btn-danger btn-sm"
+                                                                data-bs-toggle="tooltip" 
+                                                                data-bs-placement="top" 
+                                                                title="Hapus Informasi"
+                                                                onclick="confirmDelete(<?= $row['id'] ?>)">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>
+                                        
+                                        <script>
+                                        function confirmDelete(id) {
+                                            Swal.fire({
+                                                title: 'Konfirmasi Hapus',
+                                                text: 'Apakah Anda yakin ingin menghapus data ini?',
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#ef4444',
+                                                cancelButtonColor: '#6B7280',
+                                                confirmButtonText: 'Ya, Hapus!',
+                                                cancelButtonText: 'Batal',
+                                                reverseButtons: true
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = 'hapus_info.php?id=' + id;
+                                                }
+                                            });
+                                        }
+                                        </script>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     <?php endif; ?>
                 </div>
+                <!-- Spacing di bagian bawah -->
+                <div class="bottom-spacing mb-6"></div>
             </main>
         </div>
     </div>
-    <?php include '../partials/footer.php'; ?>
+    <?php include '../../partials/footer.php'; ?>
+    
+    <script>
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    // Sweet Alert confirmation for delete
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            text: 'Apakah Anda yakin ingin menghapus informasi ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'hapus_info.php?id=' + id;
+            }
+        });
+    }
+    </script>
 </body>
 
 </html>

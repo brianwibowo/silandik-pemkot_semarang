@@ -482,7 +482,7 @@ if ($isAdmin) {
                     <div class="section-card">
                         <div class="section-header d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-users"></i>Data Siswa</span>
-                            <a href="export_siswa_excel.php?id=<?= $sekolah['id'] ?>" class="btn btn-success btn-sm">
+                            <a href="../siswa/export_siswa_excel.php?id=<?= $sekolah['id'] ?>" class="btn btn-success btn-sm">
                                 <i class="fas fa-download"></i> Download Excel
                             </a>
                         </div>
@@ -519,8 +519,8 @@ if ($isAdmin) {
                                             <td class="text-center"><?= sanitizeOutput($row['kelas']); ?></td>
                                             <td class="text-center"><?= sanitizeOutput($row['jenis_inklusi']); ?></td>
                                             <td class="text-center">
-                                                <a href="edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <a href="hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('Hapus siswa ini?')"><i class="fas fa-trash"></i></a>
+                                                <a href="../siswa/edit_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></a>
+                                                <a href="../siswa/hapus_siswa.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('Hapus siswa ini?')"><i class="fas fa-trash"></i></a>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>

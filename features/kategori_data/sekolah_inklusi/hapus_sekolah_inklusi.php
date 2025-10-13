@@ -19,6 +19,6 @@ mysqli_query($conn, "DELETE FROM prasarana WHERE sekolah_id =$id");
 //hapus data sekolalah dari data_sekolah_inklusi
 mysqli_query($conn, "DELETE FROM data_sekolah_inklusi WHERE id =$id");
 
-
-header("location: data_sekolah_inklusi.php");
+// Redirect dengan notifikasi sukses
+header("Location: data_sekolah_inklusi.php?success=delete");
 exit;

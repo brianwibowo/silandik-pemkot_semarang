@@ -40,11 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tmp = $_FILES['foto']['tmp_name'];
             $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
             $namaFile = uniqid() . '_' . time() . '.' . $ext;
-            $target = '../../uploads/info_sekolah' . $namaFile;
+            $target = '../../upload/info_sekolah/' . $namaFile;
 
             if (move_uploaded_file($tmp, $target)) {
-                if (!empty($data['foto']) && file_exists('../../uploads/info_sekolah' . $data['foto'])) {
-                    unlink('../../uploads/info_sekolah' . $data['foto']);
+                if (!empty($data['foto']) && file_exists('../../upload/info_sekolah/' . $data['foto'])) {
+                    unlink('../../upload/info_sekolah/' . $data['foto']);
                 }
                 $foto = $namaFile;
             } else {
@@ -56,10 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("UPDATE info_sekolah_inklusi SET sekolah_id=?, nama_kegiatan=?, foto=?, tanggal=? WHERE id=?");
             $stmt->bind_param("isssi", $sekolah_id, $nama_kegiatan, $foto, $tanggal, $id);
             if ($stmt->execute()) {
-                $success = "Informasi berhasil diperbarui.";
-                echo "<script>setTimeout(function(){ window.location.href='informasi_sekolah_inklusi.php'; }, 1500);</script>";
+                $_SESSION['flash_message'] = 'success_edit';
+                header('Location: informasi_sekolah_inklusi.php');
+                exit;
             } else {
-                $error = "Gagal menyimpan ke database: " . $conn->error;
+                $_SESSION['flash_message'] = 'error_edit';
+                header('Location: informasi_sekolah_inklusi.php');
+                exit;
             }
         }
     }
@@ -70,7 +73,7 @@ $sekolahList = mysqli_query($conn, "SELECT id, nama_sekolah FROM data_sekolah_in
 ?>
 
 <body>
-    <?php include '../sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
@@ -113,7 +116,7 @@ $sekolahList = mysqli_query($conn, "SELECT id, nama_sekolah FROM data_sekolah_in
                                     <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
                                     <?php if ($data['foto']) : ?>
                                         <div class="mt-2">
-                                            <img src="../uploads/<?= htmlspecialchars($data['foto']) ?>" width="120" alt="Foto Sebelumnya">
+                                            <img src="../../upload/info_sekolah/<?= htmlspecialchars($data['foto']) ?>" width="120" alt="Foto Sebelumnya">
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -127,6 +130,6 @@ $sekolahList = mysqli_query($conn, "SELECT id, nama_sekolah FROM data_sekolah_in
             </main>
         </div>
     </div>
-    <?php include '../partials/footer.php'; ?>
+    <?php include '../../partials/footer.php'; ?>
 </body>
 </html>
