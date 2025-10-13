@@ -9,6 +9,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 include '../../partials/head.php';
 include '../../koneksi.php';
+?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
@@ -40,11 +43,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (in_array($fileExt, $allowed)) {
             $newName = uniqid('regulasi_', true) . '.' . $fileExt;
-            $dest = "../../../pdfs/" . $newName;
+            $dest = "../../pdfs/" . $newName;
             if (move_uploaded_file($fileTmp, $dest)) {
                 // Hapus file lama jika ada
-                if ($draft_hukum && file_exists("../../../pdfs/" . $draft_hukum)) {
-                    unlink("../../../pdfs/" . $draft_hukum);
+                if ($draft_hukum && file_exists("../../pdfs/" . $draft_hukum)) {
+                    unlink("../../pdfs/" . $draft_hukum);
                 }
                 $draft_hukum = $newName;
             } else {
@@ -59,17 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = mysqli_prepare($conn, "UPDATE dasar_hukum SET nomor_regulasi=?, tentang=?, draft_hukum=? WHERE id=?");
         mysqli_stmt_bind_param($stmt, "sssi", $nomor_regulasi, $tentang, $draft_hukum, $id);
         if (mysqli_stmt_execute($stmt)) {
-            echo "<script>
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: 'Regulasi berhasil diperbarui.',
-                    icon: 'success',
-                    confirmButtonColor: '#198754',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.href = 'dasar_hukum.php';
-                });
-            </script>";
+            $_SESSION['success_message'] = true;
+            header("Location: dasar_hukum.php");
             exit;
         } else {
             $error = "Gagal memperbarui regulasi.";
@@ -79,7 +73,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body>
     <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
@@ -109,10 +102,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <input type="file" name="draft_hukum" class="form-control" accept="application/pdf">
                                     <?php if ($data['draft_hukum']): ?>
                                         <div class="mt-2">
-                                            <a href="../../../pdfs<?= htmlspecialchars($data['draft_hukum']) ?>" target="_blank" class="btn btn-sm btn-primary">
+                                            <a href="/pdfs/<?= htmlspecialchars($data['draft_hukum']) ?>" target="_blank" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-eye"></i> Lihat Draft Lama
                                             </a>
-                                            <a href=" <?= htmlspecialchars($data['draft_hukum']) ?>" download class="btn btn-sm btn-success">
+                                            <a href="/pdfs/<?= htmlspecialchars($data['draft_hukum']) ?>" class="btn btn-sm btn-success" download="<?= htmlspecialchars($data['nomor_regulasi']) ?>.pdf">
                                                 <i class="fas fa-download"></i> Unduh Draft Lama
                                             </a>
                                         </div>

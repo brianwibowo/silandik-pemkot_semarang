@@ -6,6 +6,21 @@ include '../../koneksi.php';
 
 // Ambil semua regulasi
 $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
+
+// Tampilkan pesan sukses jika ada
+if (isset($_SESSION['success_message'])) {
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Regulasi berhasil diperbarui.',
+                icon: 'success',
+                confirmButtonColor: '#198754'
+            });
+        });
+    </script>";
+    unset($_SESSION['success_message']);
+}
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -51,7 +66,7 @@ $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
                                             <td><?= htmlspecialchars($row['tentang'] ?? '-'); ?></td>
                                             <td class="text-center">
                                                 <?php if ($namaFile): ?>
-                                                    <a href="../../pdfs  <?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-primary mb-1" target="_blank">
+                                                    <a href="../../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-primary mb-1" target="_blank">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <a href="../../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-success mb-1" download>
@@ -71,7 +86,7 @@ $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
                                                     </a>
                                                 <?php endif; ?>
                                                 <?php if ($namaFile): ?>
-                                                    <a href="../../pdfs<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-info mb-1" target="_blank">
+                                                    <a href="../../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-info mb-1" target="_blank">
                                                         <i class="fas fa-external-link-alt"></i>
                                                     </a>
                                                 <?php endif; ?>

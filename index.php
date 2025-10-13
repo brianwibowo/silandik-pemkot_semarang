@@ -917,85 +917,141 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedKategori = kategoriFilter.value;
         const selectedSort = sortFilter.value;
 
-        let visibleCards = Array.from(beritaCards).filter(card => {
-            const judul = card.dataset.judul || '';
-            const isi = card.dataset.isi || '';
+        // Dapatkan semua section berita
+        const sekolahSection = document.getElementById('beritaSekolahSection');
+        const dinasSection = document.getElementById('beritaDinasSection');
+        
+        // Dapatkan kartu untuk setiap section
+        const sekolahCards = sekolahSection.querySelectorAll('.berita-card');
+        const dinasCards = dinasSection.querySelectorAll('.berita-card');
+
+        // Function untuk mengecek apakah kartu sesuai dengan filter
+        function matchesFilter(card) {
+            const judul = (card.dataset.judul || '').toLowerCase();
+            const isi = (card.dataset.isi || '').toLowerCase();
             const kategori = card.dataset.kategori || '';
 
-            // Search filter
             const matchesSearch = searchTerm === '' || 
                                 judul.includes(searchTerm) || 
                                 isi.includes(searchTerm);
 
-            // Category filter
             const matchesKategori = selectedKategori === '' || 
-                                   kategori === selectedKategori;
+                                  kategori === selectedKategori;
 
             return matchesSearch && matchesKategori;
-        });
+        }
 
-        // Hide all cards first
-        beritaCards.forEach(card => {
-            card.style.display = 'none';
-        });
-
-        // Sort visible cards
-        if (selectedSort === 'judul') {
-            visibleCards.sort((a, b) => {
-                const judulA = a.dataset.judul || '';
-                const judulB = b.dataset.judul || '';
-                return judulA.localeCompare(judulB);
-            });
-        } else if (selectedSort === 'baru') {
-            visibleCards.sort((a, b) => {
-                const tanggalA = new Date(a.dataset.tanggal || 0);
-                const tanggalB = new Date(b.dataset.tanggal || 0);
-                return tanggalB - tanggalA;
-            });
-        } else if (selectedSort === 'lama') {
-            visibleCards.sort((a, b) => {
-                const tanggalA = new Date(a.dataset.tanggal || 0);
-                const tanggalB = new Date(b.dataset.tanggal || 0);
-                return tanggalA - tanggalB;
+        // Function untuk sorting
+        function sortCards(cards) {
+            return Array.from(cards).sort((a, b) => {
+                if (selectedSort === 'judul') {
+                    const judulA = (a.dataset.judul || '').toLowerCase();
+                    const judulB = (b.dataset.judul || '').toLowerCase();
+                    return judulA.localeCompare(judulB);
+                } else if (selectedSort === 'baru') {
+                    return new Date(b.dataset.tanggal) - new Date(a.dataset.tanggal);
+                } else if (selectedSort === 'lama') {
+                    return new Date(a.dataset.tanggal) - new Date(b.dataset.tanggal);
+                }
+                return 0;
             });
         }
 
-        // Show filtered and sorted cards
-        visibleCards.forEach((card, index) => {
-            card.style.display = 'block';
-            card.style.order = index;
-        });
+        // Filter dan sort untuk setiap section
+        function updateSection(section, cards) {
+            const newsGrid = section.querySelector('.news-grid');
+            let visibleCount = 0;
 
-        // Update empty states
-        updateEmptyStates();
+            // Filter dan sort cards
+            const sortedCards = sortCards(Array.from(cards).filter(matchesFilter));
+            
+            // Update visibility dan order
+            cards.forEach(card => {
+                const isVisible = sortedCards.includes(card);
+                card.style.display = isVisible ? 'block' : 'none';
+                if (isVisible) {
+                    card.style.order = sortedCards.indexOf(card);
+                    visibleCount++;
+                }
+            });
+
+            // Update empty state
+            const emptyState = section.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+
+            return visibleCount;
+        }
+
+        // Update kedua section
+        const sekolahVisible = updateSection(sekolahSection, sekolahCards);
+        const dinasVisible = updateSection(dinasSection, dinasCards);
+
+        // Tampilkan pesan jika tidak ada hasil sama sekali
+        const noResults = !sekolahVisible && !dinasVisible;
+        if (noResults) {
+            if (!document.querySelector('.no-results-message')) {
+                const message = document.createElement('div');
+                message.className = 'no-results-message empty-state';
+                message.innerHTML = '<i class="fas fa-search empty-icon" aria-hidden="true"></i><p>Tidak ada berita yang sesuai dengan filter</p>';
+                document.querySelector('.container-fluid').insertBefore(message, sekolahSection);
+            }
+        } else {
+            const message = document.querySelector('.no-results-message');
+            if (message) message.remove();
+        }
     }
 
-    // Function untuk update empty states
-    function updateEmptyStates() {
-        const sekolahSection = document.getElementById('beritaSekolahSection');
-        const dinasSection = document.getElementById('beritaDinasSection');
-        
-        const visibleSekolahCards = sekolahSection.querySelectorAll('.berita-card[data-kategori="sekolah"][style*="block"]');
-        const visibleDinasCards = dinasSection.querySelectorAll('.berita-card[data-kategori="dinas"][style*="block"]');
-
-        // Show/hide sections based on visible cards
-        const sekolahGrid = sekolahSection.querySelector('.news-grid');
-        const dinasGrid = dinasSection.querySelector('.news-grid');
-
-        if (visibleSekolahCards.length === 0) {
-            sekolahGrid.innerHTML = '<div class="empty-state"><i class="fas fa-search empty-icon" aria-hidden="true"></i><p>Tidak ada berita sekolah yang sesuai dengan filter</p></div>';
-        }
-
-        if (visibleDinasCards.length === 0) {
-            dinasGrid.innerHTML = '<div class="empty-state"><i class="fas fa-search empty-icon" aria-hidden="true"></i><p>Tidak ada berita dinas yang sesuai dengan filter</p></div>';
-        }
+    // Tambahkan empty state elements saat inisialisasi
+    function initializeEmptyStates() {
+        const sections = ['beritaSekolahSection', 'beritaDinasSection'];
+        sections.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            const newsGrid = section.querySelector('.news-grid');
+            
+            // Tambahkan empty state jika belum ada
+            if (!section.querySelector('.empty-state')) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.style.display = 'none';
+                emptyState.innerHTML = `
+                    <i class="fas fa-search empty-icon" aria-hidden="true"></i>
+                    <p>Tidak ada berita ${sectionId === 'beritaSekolahSection' ? 'sekolah' : 'dinas'} yang sesuai dengan filter</p>
+                `;
+                newsGrid.appendChild(emptyState);
+            }
+        });
     }
+
+    // Panggil inisialisasi empty states
+    initializeEmptyStates();
 
     // Event listeners dengan debounce untuk search
-    const debouncedFilter = debounce(filterBerita, 300);
+    const debouncedFilter = debounce(() => {
+        filterBerita();
+        // Simpan state filter ke sessionStorage
+        sessionStorage.setItem('filterState', JSON.stringify({
+            search: searchInput.value,
+            kategori: kategoriFilter.value,
+            sort: sortFilter.value
+        }));
+    }, 300);
+
+    // Attach event listeners
     searchInput.addEventListener('input', debouncedFilter);
-    kategoriFilter.addEventListener('change', filterBerita);
-    sortFilter.addEventListener('change', filterBerita);
+    kategoriFilter.addEventListener('change', debouncedFilter);
+    sortFilter.addEventListener('change', debouncedFilter);
+
+    // Restore filter state jika ada
+    const savedState = sessionStorage.getItem('filterState');
+    if (savedState) {
+        const state = JSON.parse(savedState);
+        searchInput.value = state.search || '';
+        kategoriFilter.value = state.kategori || '';
+        sortFilter.value = state.sort || '';
+        filterBerita(); // Apply filter
+    }
 
     // Error handling untuk gambar yang gagal dimuat
     document.querySelectorAll('.news-image').forEach(img => {
