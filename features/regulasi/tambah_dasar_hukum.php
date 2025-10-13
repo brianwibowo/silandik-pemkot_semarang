@@ -1,8 +1,8 @@
 <?php
 session_start();
-include '../config.php';
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../config.php';
+include '../../partials/head.php';
+include '../../koneksi.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: dasar_hukum.php");
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (in_array($fileExt, $allowed)) {
             $newName = uniqid('regulasi_', true) . '.' . $fileExt;
-            $dest = "../pdfs/" . $newName;
+            $dest = "../../../pdfs" . $newName;
             if (move_uploaded_file($fileTmp, $dest)) {
                 $draft_hukum = $newName;
             } else {
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <body>
-    <?php include '../sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
@@ -89,6 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </main>
         </div>
     </div>
-    <?php include '../partials/footer.php'; ?>
+    <?php include '../../partials/footer.php'; ?>
 </body>
 </html>

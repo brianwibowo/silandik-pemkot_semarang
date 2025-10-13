@@ -1,8 +1,8 @@
 <?php
 session_start();
-include '../config.php';
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../config.php';
+include '../../partials/head.php';
+include '../../koneksi.php';
 
 // Ambil semua regulasi
 $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
@@ -11,7 +11,7 @@ $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body>
-    <?php include '../sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
@@ -51,10 +51,10 @@ $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
                                             <td><?= htmlspecialchars($row['tentang'] ?? '-'); ?></td>
                                             <td class="text-center">
                                                 <?php if ($namaFile): ?>
-                                                    <a href="../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-primary mb-1" target="_blank">
+                                                    <a href="../../pdfs  <?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-primary mb-1" target="_blank">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-success mb-1" download>
+                                                    <a href="../../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-success mb-1" download>
                                                         <i class="fas fa-download"></i>
                                                     </a>
                                                 <?php else: ?>
@@ -71,7 +71,7 @@ $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
                                                     </a>
                                                 <?php endif; ?>
                                                 <?php if ($namaFile): ?>
-                                                    <a href="../pdfs/<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-info mb-1" target="_blank">
+                                                    <a href="../../pdfs<?= rawurlencode($namaFile) ?>" class="btn btn-sm btn-info mb-1" target="_blank">
                                                         <i class="fas fa-external-link-alt"></i>
                                                     </a>
                                                 <?php endif; ?>
@@ -87,6 +87,6 @@ $data = mysqli_query($conn, "SELECT * FROM dasar_hukum ORDER BY id ASC");
             </main>
         </div>
     </div>
-    <?php include '../partials/footer.php'; ?>
+    <?php include '../../partials/footer.php'; ?>
 </body>
 </html>

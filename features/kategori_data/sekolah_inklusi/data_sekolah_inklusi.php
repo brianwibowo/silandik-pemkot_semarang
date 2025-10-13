@@ -10,7 +10,7 @@ $isPengurus = isset($_SESSION['role']) && $_SESSION['role'] === 'pengurus';
 $user_sekolah_id = $isPengurus && isset($_SESSION['sekolah_id']) ? $_SESSION['sekolah_id'] : null;
 ?>
 <div id="background">
-    <?php include '../sidebar.php'; ?>
+    <?php include '../../../partials/sidebar.php'; ?>
 
     <!-- Header Section -->
     <div class="header-section">

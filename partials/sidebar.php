@@ -1,9 +1,9 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
-$current_page = basename($_SERVER['PHP_SELF']);
+
 // Pastikan koneksi database sudah tersedia jika ingin ambil foto user
 if (!isset($conn)) {
-    @include_once '../koneksi.php';
+    @include_once $_SERVER['DOCUMENT_ROOT'] . '/koneksi.php';
 }
 
 // Cek status request pengurus untuk user yang login
@@ -21,12 +21,17 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
     // Untuk role admin dan pengurus, ambil username dari session
     $user_username = $_SESSION['username'];
 }
+
+// Function untuk mengecek active menu
+function isActive($path) {
+    return strpos($_SERVER['PHP_SELF'], $path) !== false ? 'active' : '';
+}
 ?>
 
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="../index.php">
-            <img src="../assets/logo_dinas.png" alt="Logo Dinas" width="40" height="32"> 
+        <a class="navbar-brand" href="/index.php">
+            <img src="/assets/logo_dinas.png" alt="Logo Dinas" width="40" height="32"> 
             SILANDIK
         </a>
         
@@ -38,21 +43,21 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
             <ul class="navbar-nav me-auto">
                 <!-- Beranda -->
                 <li class="nav-item">
-                    <a class="nav-link <?= ($current_page == 'index.php') ? 'active' : '' ?>" href="../index.php">
+                    <a class="nav-link <?= isActive('/index.php') ?>" href="/index.php">
                         <i class="fas fa-home"></i> Beranda
                     </a>
                 </li>
                 
                 <!-- Regulasi -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle <?= ($current_page == '../features/dasar_hukum.php') ? 'active' : '' ?>" 
+                    <a class="nav-link dropdown-toggle <?= isActive('/features/regulasi/dasar_hukum.php') ?>" 
                        href="#" id="navbarDropdownRegulasi" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-gavel"></i> Regulasi
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownRegulasi">
                         <li>
-                            <a class="dropdown-item <?= ($current_page == '../features/dasar_hukum.php') ? 'active' : '' ?>" 
-                               href="../features/regulasi/dasar_hukum.php">
+                            <a class="dropdown-item <?= isActive('/features/regulasi/dasar_hukum.php') ?>" 
+                               href="/features/regulasi/dasar_hukum.php">
                                 <i class="fas fa-balance-scale"></i> Dasar Hukum
                             </a>
                         </li>
@@ -61,20 +66,20 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
                 
                 <!-- Sekolah Inklusi -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle <?= in_array($current_page, ['../features/kategori_data/sekolah_inklusi/data_sekolah_inklusi.php', '../features/kategori_data/sekolah_inklusi/edit_sekolah_inklusi.php', '../features/kategori_data/siswa/data_siswa.php']) ? 'active' : '' ?>" 
+                    <a class="nav-link dropdown-toggle <?= (isActive('/features/kategori_data/sekolah_inklusi/') || isActive('/features/kategori_data/siswa/')) ? 'active' : '' ?>" 
                        href="#" id="navbarDropdownSekolah" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-school"></i> Sekolah Inklusi
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownSekolah">
                         <li>
-                            <a class="dropdown-item <?= in_array($current_page, ['data_sekolah_inklusi.php', 'edit_sekolah_inklusi.php']) ? 'active' : '' ?>" 
-                               href="../features/kategori_data/sekolah_inklusi/data_sekolah_inklusi.php">
+                            <a class="dropdown-item <?= isActive('/features/kategori_data/sekolah_inklusi/data_sekolah_inklusi.php') ?>" 
+                               href="/features/kategori_data/sekolah_inklusi/data_sekolah_inklusi.php">
                                 <i class="fas fa-building"></i> Data Sekolah Inklusi
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item <?= ($current_page == '../features/kategori_data/siswa/data_siswa.php') ? 'active' : '' ?>" 
-                               href="../features/kategori_data/siswa/data_siswa.php">
+                            <a class="dropdown-item <?= isActive('/features/kategori_data/siswa/data_siswa.php') ?>" 
+                               href="/features/kategori_data/siswa/data_siswa.php">
                                 <i class="fas fa-users"></i> Data Siswa
                             </a>
                         </li>
@@ -83,16 +88,16 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
                 
                 <!-- Informasi Sekolah Inklusi -->
                 <li class="nav-item">
-                    <a class="nav-link <?= ($current_page == '../features/informasi_sekolah_inklusi.php') ? 'active' : '' ?>" 
-                       href="../features/info_sekolah_inklusi/informasi_sekolah_inklusi.php">
+                    <a class="nav-link <?= isActive('/features/info_sekolah_inklusi/informasi_sekolah_inklusi.php') ?>" 
+                       href="/features/info_sekolah_inklusi/informasi_sekolah_inklusi.php">
                         <i class="fas fa-info-circle"></i> Informasi Sekolah Inklusi
                     </a>
                 </li>
                 
                 <!-- Dokumen Kurikulum -->
                 <li class="nav-item">
-                    <a class="nav-link <?= ($current_page == '../features/dokumen_kurikulum_inklusi.php') ? 'active' : '' ?>" 
-                       href="../features/dokumen_kurikulum/dokumen_kurikulum_inklusi.php">
+                    <a class="nav-link <?= isActive('/features/dokumen_kurikulum/dokumen_kurikulum_inklusi.php') ?>" 
+                       href="/features/dokumen_kurikulum/dokumen_kurikulum_inklusi.php">
                         <i class="fas fa-file-alt"></i> Dokumen Kurikulum Inklusi
                     </a>
                 </li>
@@ -102,7 +107,7 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
             <div class="auth-section d-flex align-items-center gap-2">
                 <!-- Admin Panel Access -->
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') : ?>
-                    <a href="../authentification/admin.php" class="btn btn-warning">
+                    <a href="/authentification/admin.php" class="btn btn-warning">
                         <i class="fas fa-user-shield"></i> Admin Panel
                     </a>
                 
@@ -115,7 +120,7 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
                         </span>
                     <?php else : ?>
                         <!-- Jika belum ada request -->
-                        <form action="../authentification/request_pengurus.php" method="POST" style="display:inline;">
+                        <form action="/authentification/request_pengurus.php" method="POST" style="display:inline;">
                             <button type="submit" class="btn btn-outline-success btn-sm">
                                 <i class="fas fa-user-plus"></i> Request
                             </button>

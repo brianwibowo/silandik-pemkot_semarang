@@ -1,14 +1,14 @@
 <?php
 session_start();
-include '../config.php';
+include '../../config.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../index.php");
     exit;
 }
 
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../partials/head.php';
+include '../../koneksi.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
@@ -40,11 +40,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (in_array($fileExt, $allowed)) {
             $newName = uniqid('regulasi_', true) . '.' . $fileExt;
-            $dest = "../pdfs/" . $newName;
+            $dest = "../../../pdfs/" . $newName;
             if (move_uploaded_file($fileTmp, $dest)) {
                 // Hapus file lama jika ada
-                if ($draft_hukum && file_exists("../pdfs/" . $draft_hukum)) {
-                    unlink("../pdfs/" . $draft_hukum);
+                if ($draft_hukum && file_exists("../../../pdfs/" . $draft_hukum)) {
+                    unlink("../../../pdfs/" . $draft_hukum);
                 }
                 $draft_hukum = $newName;
             } else {
@@ -81,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body>
-    <?php include '../sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
@@ -109,10 +109,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <input type="file" name="draft_hukum" class="form-control" accept="application/pdf">
                                     <?php if ($data['draft_hukum']): ?>
                                         <div class="mt-2">
-                                            <a href="../pdfs/<?= htmlspecialchars($data['draft_hukum']) ?>" target="_blank" class="btn btn-sm btn-primary">
+                                            <a href="../../../pdfs<?= htmlspecialchars($data['draft_hukum']) ?>" target="_blank" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-eye"></i> Lihat Draft Lama
                                             </a>
-                                            <a href="../pdfs/<?= htmlspecialchars($data['draft_hukum']) ?>" download class="btn btn-sm btn-success">
+                                            <a href=" <?= htmlspecialchars($data['draft_hukum']) ?>" download class="btn btn-sm btn-success">
                                                 <i class="fas fa-download"></i> Unduh Draft Lama
                                             </a>
                                         </div>
@@ -128,6 +128,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </main>
         </div>
     </div>
-    <?php include '../partials/footer.php'; ?>
+    <?php include '../../partials/footer.php'; ?>
 </body>
 </html>

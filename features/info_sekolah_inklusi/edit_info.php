@@ -1,12 +1,12 @@
 <?php
 session_start();
-include '../config.php';
-include '../partials/head.php';
-include '../koneksi.php';
+include '../../config.php';
+include '../../partials/head.php';
+include '../../koneksi.php';
 
 // Akses khusus admin atau pengurus
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'pengurus'])) {
-    header('Location: login.php');
+    header('Location: ../../authentification/login.php');
     exit;
 }
 
@@ -40,11 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tmp = $_FILES['foto']['tmp_name'];
             $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
             $namaFile = uniqid() . '_' . time() . '.' . $ext;
-            $target = '../uploads/' . $namaFile;
+            $target = '../../uploads/info_sekolah' . $namaFile;
 
             if (move_uploaded_file($tmp, $target)) {
-                if (!empty($data['foto']) && file_exists('../uploads/' . $data['foto'])) {
-                    unlink('../uploads/' . $data['foto']);
+                if (!empty($data['foto']) && file_exists('../../uploads/info_sekolah' . $data['foto'])) {
+                    unlink('../../uploads/info_sekolah' . $data['foto']);
                 }
                 $foto = $namaFile;
             } else {
