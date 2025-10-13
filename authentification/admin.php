@@ -17,8 +17,24 @@ if (isset($_GET['action'], $_GET['id'])) {
     $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
     $action = $_GET['action'];
     
-    if ($id && in_array($action, ['approve', 'decline', 'change_role'])) {
-        if ($action === 'approve') {
+    if ($id && in_array($action, ['approve', 'decline', 'change_role', 'delete'])) {
+        if ($action === 'delete') {
+            // Pastikan bukan menghapus diri sendiri
+            if ($id != $_SESSION['user_id']) {
+                $stmt = mysqli_prepare($conn, "DELETE FROM users WHERE id=? AND email != ?");
+                mysqli_stmt_bind_param($stmt, "is", $id, $_SESSION['email']);
+                if (mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) > 0) {
+                    $message = "User berhasil dihapus!";
+                    $message_type = "success";
+                } else {
+                    $message = "Gagal menghapus user.";
+                    $message_type = "error";
+                }
+            } else {
+                $message = "Tidak dapat menghapus akun sendiri!";
+                $message_type = "error";
+            }
+        } elseif ($action === 'approve') {
             $stmt = mysqli_prepare($conn, "UPDATE users SET role='pengurus', request_pengurus=0 WHERE id=? AND request_pengurus=1");
             mysqli_stmt_bind_param($stmt, "i", $id);
             if (mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) > 0) {
@@ -28,7 +44,6 @@ if (isset($_GET['action'], $_GET['id'])) {
                 $message = "Gagal menyetujui permintaan atau permintaan tidak ditemukan.";
                 $message_type = "error";
             }
-            mysqli_stmt_close($stmt);
         } elseif ($action === 'decline') {
             $stmt = mysqli_prepare($conn, "UPDATE users SET request_pengurus=0 WHERE id=? AND request_pengurus=1");
             mysqli_stmt_bind_param($stmt, "i", $id);
@@ -39,7 +54,6 @@ if (isset($_GET['action'], $_GET['id'])) {
                 $message = "Gagal menolak permintaan atau permintaan tidak ditemukan.";
                 $message_type = "error";
             }
-            mysqli_stmt_close($stmt);
         } elseif ($action === 'change_role' && isset($_GET['new_role'])) {
             $new_role = $_GET['new_role'];
             if (in_array($new_role, ['umum', 'pengurus', 'admin'])) {
@@ -52,7 +66,6 @@ if (isset($_GET['action'], $_GET['id'])) {
                     $message = "Gagal mengubah role user.";
                     $message_type = "error";
                 }
-                mysqli_stmt_close($stmt);
             }
         }
     } else {
@@ -67,6 +80,16 @@ if (isset($_GET['action'], $_GET['id'])) {
 if (isset($_POST['edit_sekolah_user_id'], $_POST['edit_sekolah_id'])) {
     $edit_user_id = intval($_POST['edit_sekolah_user_id']);
     $edit_sekolah_id = intval($_POST['edit_sekolah_id']);
+    
+    // Cek struktur tabel
+    $check_column = mysqli_query($conn, "SHOW COLUMNS FROM users LIKE 'sekolah_id'");
+    
+    if (mysqli_num_rows($check_column) == 0) {
+        // Jika kolom belum ada, buat dulu
+        mysqli_query($conn, "ALTER TABLE users ADD COLUMN sekolah_id INT DEFAULT NULL");
+        mysqli_query($conn, "ALTER TABLE users ADD CONSTRAINT fk_sekolah FOREIGN KEY (sekolah_id) REFERENCES data_sekolah_inklusi(id) ON DELETE SET NULL");
+    }
+    
     // Pastikan usernya pengurus
     $cek = mysqli_query($conn, "SELECT id FROM users WHERE id=$edit_user_id AND role='pengurus'");
     if (mysqli_num_rows($cek) > 0) {
@@ -90,17 +113,30 @@ if (isset($_GET['msg']) && isset($_GET['type'])) {
     $message_type = htmlspecialchars($_GET['type']);
 }
 
-// Ambil semua request pengurus
-$stmt_requests = mysqli_prepare($conn, "SELECT id, email, request_pengurus, role, created_at FROM users WHERE request_pengurus=1 ORDER BY created_at DESC");
-mysqli_stmt_execute($stmt_requests);
-$result_requests = mysqli_stmt_get_result($stmt_requests);
+try {
+    // Ambil semua request pengurus
+    $result_requests = mysqli_query($conn, "SELECT id, email, request_pengurus, role, created_at FROM users WHERE request_pengurus=1 ORDER BY created_at DESC");
+    if (!$result_requests) {
+        throw new Exception(mysqli_error($conn));
+    }
 
-// Ambil semua user (tambahkan sekolah_id)
-$stmt_users = mysqli_prepare($conn, "SELECT id, email, role, sekolah_id, request_pengurus, created_at FROM users ORDER BY created_at DESC");
-mysqli_stmt_execute($stmt_users);
-$result_users = mysqli_stmt_get_result($stmt_users);
+    // Ambil semua user
+    $result_users = mysqli_query($conn, "SELECT id, email, role, request_pengurus, created_at FROM users ORDER BY created_at DESC");
+    if (!$result_users) {
+        throw new Exception(mysqli_error($conn));
+    }
+} catch (Exception $e) {
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '" . addslashes($e->getMessage()) . "'
+            });
+        });
+    </script>";
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -112,34 +148,38 @@ $result_users = mysqli_stmt_get_result($stmt_users);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+    <?php
+    // Set default active tab
+    $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'requests';
+    ?>
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="fas fa-user-cog"></i> Admin Panel</h2>
             <div>
-                <span class="badge bg-danger">Admin: <?= htmlspecialchars($_SESSION['email'] ?? $_SESSION['email']) ?></span>
+                <span class="badge bg-danger">Admin: <?= htmlspecialchars($_SESSION['email']) ?></span>
             </div>
         </div>
         
         <!-- Tab Navigation -->
-        <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button" role="tab">
-                    <i class="fas fa-clipboard-list"></i> Permintaan Pengurus 
-                    <span class="badge bg-danger ms-1"><?= mysqli_num_rows($result_requests) ?></span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
-                    <i class="fas fa-users"></i> Kelola User 
-                    <span class="badge bg-primary ms-1"><?= mysqli_num_rows($result_users) ?></span>
-                </button>
-            </li>
-        </ul>
+        <div class="d-flex gap-2 mb-4">
+            <a href="?tab=requests" class="btn <?= $activeTab === 'requests' ? 'btn-primary' : 'btn-outline-primary' ?>">
+                <i class="fas fa-clipboard-list"></i> Permintaan Pengurus 
+                <span class="badge <?= $activeTab === 'requests' ? 'bg-light text-dark' : 'bg-primary' ?> ms-1">
+                    <?= mysqli_num_rows($result_requests) ?>
+                </span>
+            </a>
+            <a href="?tab=users" class="btn <?= $activeTab === 'users' ? 'btn-primary' : 'btn-outline-primary' ?>">
+                <i class="fas fa-users"></i> Kelola User 
+                <span class="badge <?= $activeTab === 'users' ? 'bg-light text-dark' : 'bg-primary' ?> ms-1">
+                    <?= mysqli_num_rows($result_users) ?>
+                </span>
+            </a>
+        </div>
 
         <!-- Tab Content -->
         <div class="tab-content" id="adminTabsContent">
             <!-- Tab Permintaan Pengurus -->
-            <div class="tab-pane fade show active" id="requests" role="tabpanel">
+            <div class="tab-pane <?= $activeTab === 'requests' ? 'd-block' : 'd-none' ?>" id="requests">
                 <div class="card">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-list"></i> Daftar Permintaan Pengurus Sekolah</span>
@@ -152,62 +192,65 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                 Tidak ada permintaan pengurus sekolah saat ini.
                             </div>
                         <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 50px;">No</th>
-                                        <th>email</th>
-                                        <th>Role Saat Ini</th>
-                                        <th style="width: 150px;">Tanggal Request</th>
-                                        <th style="width: 200px;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <?php $no=1; mysqli_data_seek($result_requests, 0); while($row = mysqli_fetch_assoc($result_requests)): ?>
-                                    <tr>
-                                        <td><?= $no++ ?></td>
-                                        <td>
-                                            <i class="fas fa-user text-muted"></i>
-                                            <?= htmlspecialchars($row['email']) ?>
-                                        </td>
-                                        <td>
-                                            <?php 
-                                            $current_role_color = '';
-                                            switch($row['role']) {
-                                                case 'admin': $current_role_color = 'bg-danger'; break;
-                                                case 'pengurus': $current_role_color = 'bg-warning'; break;
-                                                case 'umum': $current_role_color = 'bg-primary'; break;
-                                                default: $current_role_color = 'bg-secondary';
-                                            }
-                                            ?>
-                                            <span class="badge <?= $current_role_color ?>"><?= htmlspecialchars(ucfirst($row['role'])) ?></span>
-                                        </td>
-                                        <td class="text-muted small">
-                                            <?= isset($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : 'N/A' ?>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-success btn-sm" onclick="confirmAction('approve', <?= $row['id'] ?>, '<?= htmlspecialchars($row['email']) ?>')">
-                                                    <i class="fas fa-check"></i> Approve
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction('decline', <?= $row['id'] ?>, '<?= htmlspecialchars($row['email']) ?>')">
-                                                    <i class="fas fa-times"></i> Decline
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50px;">No</th>
+                                            <th>Email</th>
+                                            <th>Role Saat Ini</th>
+                                            <th style="width: 150px;">Tanggal Request</th>
+                                            <th style="width: 200px;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php $no = 1; while($row = mysqli_fetch_assoc($result_requests)): ?>
+                                            <tr>
+                                                <td><?= $no++ ?></td>
+                                                <td>
+                                                    <i class="fas fa-user text-muted"></i>
+                                                    <?= htmlspecialchars($row['email']) ?>
+                                                </td>
+                                                <td>
+                                                    <?php 
+                                                    $current_role_color = match($row['role']) {
+                                                        'admin' => 'bg-danger',
+                                                        'pengurus' => 'bg-warning',
+                                                        'umum' => 'bg-primary',
+                                                        default => 'bg-secondary'
+                                                    };
+                                                    ?>
+                                                    <span class="badge <?= $current_role_color ?>">
+                                                        <?= htmlspecialchars(ucfirst($row['role'])) ?>
+                                                    </span>
+                                                </td>
+                                                <td class="text-muted small">
+                                                    <?= date('d/m/Y H:i', strtotime($row['created_at'])) ?>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-success btn-sm" 
+                                                                onclick="confirmAction('approve', <?= $row['id'] ?>, '<?= htmlspecialchars($row['email']) ?>')">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm" 
+                                                                onclick="confirmAction('decline', <?= $row['id'] ?>, '<?= htmlspecialchars($row['email']) ?>')">
+                                                            <i class="fas fa-times"></i> Decline
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
 
             <!-- Tab Kelola User -->
-            <div class="tab-pane fade" id="users" role="tabpanel">
+            <div class="tab-pane <?= $activeTab === 'users' ? 'd-block' : 'd-none' ?>" id="users">
                 <div class="card">
                     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-users"></i> Daftar Semua User</span>
@@ -220,99 +263,154 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                 Tidak ada user yang terdaftar.
                             </div>
                         <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 50px;">No</th>
-                                        <th>email</th>
-                                        <th>Role</th>
-                                        <th>Sekolah Dikelola</th>
-                                        <th>Status Request</th>
-                                        <th style="width: 150px;">Tanggal Daftar</th>
-                                        <th style="width: 200px;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <?php $no=1; mysqli_data_seek($result_users, 0); while($row = mysqli_fetch_assoc($result_users)): ?>
-                                    <tr>
-                                        <td><?= $no++ ?></td>
-                                        <td>
-                                            <i class="fas fa-user text-muted"></i>
-                                            <?= htmlspecialchars($row['email']) ?>
-                                        </td>
-                                        <td>
-                                            <?php 
-                                            $role_color = '';
-                                            switch($row['role']) {
-                                                case 'admin': $role_color = 'bg-danger'; break;
-                                                case 'pengurus': $role_color = 'bg-warning'; break;
-                                                case 'umum': $role_color = 'bg-primary'; break;
-                                                default: $role_color = 'bg-secondary';
-                                            }
-                                            ?>
-                                            <span class="badge <?= $role_color ?>"><?= htmlspecialchars(ucfirst($row['role'])) ?></span>
-                                        </td>
-                                        <td>
-                                            <?php if ($row['role'] === 'pengurus'): 
-                                                $sid = intval($row['sekolah_id']);
-                                                $qSekolah = mysqli_query($conn, "SELECT nama_sekolah FROM data_sekolah_inklusi WHERE id=$sid");
-                                                $dSekolah = mysqli_fetch_assoc($qSekolah);
-                                                $namaSekolah = $dSekolah ? htmlspecialchars($dSekolah['nama_sekolah']) : '<span class="text-danger">Tidak ditemukan</span>';
-                                            ?>
-                                                <span id="nama-sekolah-<?= $row['id'] ?>"><?= $namaSekolah ?></span>
-                                                <button type="button" class="btn btn-sm btn-outline-primary ms-1" onclick="showEditSekolahModal(<?= $row['id'] ?>, <?= $sid ?>)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            <?php else: ?>
-                                                <span class="text-muted small">-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($row['request_pengurus'] == 1): ?>
-                                                <span class="badge bg-info">Pending Request</span>
-                                            <?php else: ?>
-                                                <span class="text-muted small">-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="text-muted small">
-                                            <?= isset($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : 'N/A' ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($row['email'] !== ($_SESSION['email'] ?? $_SESSION['email'])): ?>
-                                            <div class="dropdown">
-                                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-user-edit"></i> Ubah Role
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <?php if ($row['role'] !== 'umum'): ?>
-                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'umum', '<?= htmlspecialchars($row['email']) ?>')">
-                                                        <i class="fas fa-user text-primary"></i> Umum
-                                                    </a></li>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle border-top">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="py-3" style="width: 50px;">No</th>
+                                            <th class="py-3">Informasi User</th>
+                                            <th class="py-3" style="width: 200px;">Status</th>
+                                            <th class="py-3" style="width: 250px;">Sekolah Dikelola</th>
+                                            <th class="py-3 text-center" style="width: 250px;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="border-top-0">
+                                        <?php $no = 1; while($row = mysqli_fetch_assoc($result_users)): ?>
+                                            <tr>
+                                                <td><?= $no++ ?></td>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <div class="rounded-circle bg-light p-2">
+                                                                <i class="fas fa-user text-primary"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="fw-semibold"><?= htmlspecialchars($row['email']) ?></div>
+                                                                <div class="text-muted small">
+                                                                    <i class="fas fa-clock me-1"></i>
+                                                                    Terdaftar: <?= date('d/m/Y H:i', strtotime($row['created_at'])) ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex flex-column gap-1">
+                                                        <?php 
+                                                        $role_color = match($row['role']) {
+                                                            'admin' => 'bg-danger',
+                                                            'pengurus' => 'bg-warning',
+                                                            'umum' => 'bg-primary',
+                                                            default => 'bg-secondary'
+                                                        };
+                                                        ?>
+                                                        <span class="badge <?= $role_color ?> fw-normal">
+                                                            <i class="fas <?= $row['role'] === 'admin' ? 'fa-user-shield' : ($row['role'] === 'pengurus' ? 'fa-user-tie' : 'fa-user') ?> me-1"></i>
+                                                            <?= htmlspecialchars(ucfirst($row['role'])) ?>
+                                                        </span>
+                                                        <?php if ($row['request_pengurus'] == 1): ?>
+                                                            <span class="badge bg-info fw-normal">
+                                                                <i class="fas fa-clock me-1"></i>
+                                                                Pending Request
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <?php if ($row['role'] === 'pengurus'): 
+                                                        // Cek apakah user sudah memiliki sekolah yang dikelola
+                                                        $user_id = intval($row['id']);
+                                                        try {
+                                                            $qUserSekolah = mysqli_query($conn, "SELECT s.id, s.nama_sekolah 
+                                                                FROM data_sekolah_inklusi s 
+                                                                LEFT JOIN users u ON s.id = u.sekolah_id 
+                                                                WHERE u.id = $user_id");
+                                                            $dSekolah = mysqli_fetch_assoc($qUserSekolah);
+                                                            
+                                                            if ($dSekolah) {
+                                                                $namaSekolah = htmlspecialchars($dSekolah['nama_sekolah']);
+                                                                $sid = $dSekolah['id'];
+                                                                ?>
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <i class="fas fa-school text-primary"></i>
+                                                                    <span id="nama-sekolah-<?=$row['id']?>"><?=$namaSekolah?></span>
+                                                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                                            onclick="showEditSekolahModal(<?=$row['id']?>, <?=$sid?>)"
+                                                                            title="Ubah Sekolah">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <?php
+                                                            } else {
+                                                                ?>
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <span class="text-warning">
+                                                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                                                        Belum ditentukan
+                                                                    </span>
+                                                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                                            onclick="showEditSekolahModal(<?=$row['id']?>, 0)"
+                                                                            title="Pilih Sekolah">
+                                                                        <i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <?php
+                                                            }
+                                                        } catch (Exception $e) {
+                                                            echo '<div class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>Error: ' . $e->getMessage() . '</div>';
+                                                        }
+                                                    ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">
+                                                            <i class="fas fa-minus me-1"></i>
+                                                            Tidak Relevan
+                                                        </span>
                                                     <?php endif; ?>
-                                                    
-                                                    <?php if ($row['role'] !== 'pengurus'): ?>
-                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'pengurus', '<?= htmlspecialchars($row['email']) ?>')">
-                                                        <i class="fas fa-user-tie text-warning"></i> Pengurus
-                                                    </a></li>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if ($row['role'] !== 'admin'): ?>
-                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'admin', '<?= htmlspecialchars($row['email']) ?>')">
-                                                        <i class="fas fa-user-shield text-danger"></i> Admin
-                                                    </a></li>
-                                                    <?php endif; ?>
-                                                </ul>
-                                            </div>
-                                            <?php else: ?>
-                                            <span class="badge bg-secondary">Admin Aktif</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex justify-content-center gap-2">
+                                                        <?php if ($row['email'] !== $_SESSION['email']): ?>
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                                    <i class="fas fa-user-edit"></i> Ubah Role
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <?php if ($row['role'] !== 'umum'): ?>
+                                                                        <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'umum', '<?= htmlspecialchars($row['email']) ?>')">
+                                                                            <i class="fas fa-user text-primary"></i> Umum
+                                                                        </a></li>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if ($row['role'] !== 'pengurus'): ?>
+                                                                        <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'pengurus', '<?= htmlspecialchars($row['email']) ?>')">
+                                                                            <i class="fas fa-user-tie text-warning"></i> Pengurus
+                                                                        </a></li>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if ($row['role'] !== 'admin'): ?>
+                                                                        <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'admin', '<?= htmlspecialchars($row['email']) ?>')">
+                                                                            <i class="fas fa-user-shield text-danger"></i> Admin
+                                                                        </a></li>
+                                                                    <?php endif; ?>
+                                                                </ul>
+                                                            </div>
+                                                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                                    onclick="confirmDelete(<?= $row['id'] ?>, '<?= htmlspecialchars($row['email']) ?>')">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-secondary">
+                                                                <i class="fas fa-user-check me-1"></i>
+                                                                Admin Aktif
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -415,6 +513,35 @@ $result_users = mysqli_stmt_get_result($stmt_users);
             modal.show();
         }
 
+        // Preserve tab parameter when submitting forms
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const tabInput = document.createElement('input');
+                tabInput.type = 'hidden';
+                tabInput.name = 'tab';
+                tabInput.value = '<?= $activeTab ?>';
+                this.appendChild(tabInput);
+            });
+        });
+
+        // Fungsi untuk konfirmasi hapus user
+        function confirmDelete(id, email) {
+            Swal.fire({
+                title: 'Hapus User',
+                text: `Yakin ingin menghapus user ${email}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `?action=delete&id=${id}&tab=users`;
+                }
+            });
+        }
+
         // Tampilkan pesan jika ada
         <?php if (!empty($message)): ?>
         Swal.fire({
@@ -427,8 +554,3 @@ $result_users = mysqli_stmt_get_result($stmt_users);
     </script>
 </body>
 </html>
-
-<?php 
-mysqli_stmt_close($stmt_requests); 
-mysqli_stmt_close($stmt_users);
-?>
