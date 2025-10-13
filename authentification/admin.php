@@ -91,12 +91,12 @@ if (isset($_GET['msg']) && isset($_GET['type'])) {
 }
 
 // Ambil semua request pengurus
-$stmt_requests = mysqli_prepare($conn, "SELECT id, username, request_pengurus, role, created_at FROM users WHERE request_pengurus=1 ORDER BY created_at DESC");
+$stmt_requests = mysqli_prepare($conn, "SELECT id, email, request_pengurus, role, created_at FROM users WHERE request_pengurus=1 ORDER BY created_at DESC");
 mysqli_stmt_execute($stmt_requests);
 $result_requests = mysqli_stmt_get_result($stmt_requests);
 
 // Ambil semua user (tambahkan sekolah_id)
-$stmt_users = mysqli_prepare($conn, "SELECT id, username, role, sekolah_id, request_pengurus, created_at FROM users ORDER BY created_at DESC");
+$stmt_users = mysqli_prepare($conn, "SELECT id, email, role, sekolah_id, request_pengurus, created_at FROM users ORDER BY created_at DESC");
 mysqli_stmt_execute($stmt_users);
 $result_users = mysqli_stmt_get_result($stmt_users);
 ?>
@@ -116,7 +116,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="fas fa-user-cog"></i> Admin Panel</h2>
             <div>
-                <span class="badge bg-danger">Admin: <?= htmlspecialchars($_SESSION['username'] ?? $_SESSION['email']) ?></span>
+                <span class="badge bg-danger">Admin: <?= htmlspecialchars($_SESSION['email'] ?? $_SESSION['email']) ?></span>
             </div>
         </div>
         
@@ -157,7 +157,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                 <thead class="table-light">
                                     <tr>
                                         <th style="width: 50px;">No</th>
-                                        <th>Username</th>
+                                        <th>email</th>
                                         <th>Role Saat Ini</th>
                                         <th style="width: 150px;">Tanggal Request</th>
                                         <th style="width: 200px;">Aksi</th>
@@ -169,7 +169,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                         <td><?= $no++ ?></td>
                                         <td>
                                             <i class="fas fa-user text-muted"></i>
-                                            <?= htmlspecialchars($row['username']) ?>
+                                            <?= htmlspecialchars($row['email']) ?>
                                         </td>
                                         <td>
                                             <?php 
@@ -188,10 +188,10 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-success btn-sm" onclick="confirmAction('approve', <?= $row['id'] ?>, '<?= htmlspecialchars($row['username']) ?>')">
+                                                <button type="button" class="btn btn-success btn-sm" onclick="confirmAction('approve', <?= $row['id'] ?>, '<?= htmlspecialchars($row['email']) ?>')">
                                                     <i class="fas fa-check"></i> Approve
                                                 </button>
-                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction('decline', <?= $row['id'] ?>, '<?= htmlspecialchars($row['username']) ?>')">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmAction('decline', <?= $row['id'] ?>, '<?= htmlspecialchars($row['email']) ?>')">
                                                     <i class="fas fa-times"></i> Decline
                                                 </button>
                                             </div>
@@ -225,7 +225,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                 <thead class="table-light">
                                     <tr>
                                         <th style="width: 50px;">No</th>
-                                        <th>Username</th>
+                                        <th>email</th>
                                         <th>Role</th>
                                         <th>Sekolah Dikelola</th>
                                         <th>Status Request</th>
@@ -239,7 +239,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                         <td><?= $no++ ?></td>
                                         <td>
                                             <i class="fas fa-user text-muted"></i>
-                                            <?= htmlspecialchars($row['username']) ?>
+                                            <?= htmlspecialchars($row['email']) ?>
                                         </td>
                                         <td>
                                             <?php 
@@ -279,26 +279,26 @@ $result_users = mysqli_stmt_get_result($stmt_users);
                                             <?= isset($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?php if ($row['username'] !== ($_SESSION['username'] ?? $_SESSION['email'])): ?>
+                                            <?php if ($row['email'] !== ($_SESSION['email'] ?? $_SESSION['email'])): ?>
                                             <div class="dropdown">
                                                 <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                                     <i class="fas fa-user-edit"></i> Ubah Role
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <?php if ($row['role'] !== 'umum'): ?>
-                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'umum', '<?= htmlspecialchars($row['username']) ?>')">
+                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'umum', '<?= htmlspecialchars($row['email']) ?>')">
                                                         <i class="fas fa-user text-primary"></i> Umum
                                                     </a></li>
                                                     <?php endif; ?>
                                                     
                                                     <?php if ($row['role'] !== 'pengurus'): ?>
-                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'pengurus', '<?= htmlspecialchars($row['username']) ?>')">
+                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'pengurus', '<?= htmlspecialchars($row['email']) ?>')">
                                                         <i class="fas fa-user-tie text-warning"></i> Pengurus
                                                     </a></li>
                                                     <?php endif; ?>
                                                     
                                                     <?php if ($row['role'] !== 'admin'): ?>
-                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'admin', '<?= htmlspecialchars($row['username']) ?>')">
+                                                    <li><a class="dropdown-item" href="#" onclick="changeRole(<?= $row['id'] ?>, 'admin', '<?= htmlspecialchars($row['email']) ?>')">
                                                         <i class="fas fa-user-shield text-danger"></i> Admin
                                                     </a></li>
                                                     <?php endif; ?>
@@ -365,7 +365,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Fungsi untuk konfirmasi aksi approve/decline
-        function confirmAction(action, id, username) {
+        function confirmAction(action, id, email) {
             const actionText = action === 'approve' ? 'menyetujui' : 'menolak';
             const actionTitle = action === 'approve' ? 'Setujui Permintaan' : 'Tolak Permintaan';
             const actionIcon = action === 'approve' ? 'question' : 'warning';
@@ -373,7 +373,7 @@ $result_users = mysqli_stmt_get_result($stmt_users);
             
             Swal.fire({
                 title: actionTitle,
-                text: `Yakin ingin ${actionText} permintaan dari ${username}?`,
+                text: `Yakin ingin ${actionText} permintaan dari ${email}?`,
                 icon: actionIcon,
                 showCancelButton: true,
                 confirmButtonColor: confirmButtonColor,
@@ -388,12 +388,12 @@ $result_users = mysqli_stmt_get_result($stmt_users);
         }
 
         // Fungsi untuk mengubah role user
-        function changeRole(id, newRole, username) {
+        function changeRole(id, newRole, email) {
             const roleText = newRole === 'admin' ? 'Admin' : (newRole === 'pengurus' ? 'Pengurus' : 'Umum');
             
             Swal.fire({
                 title: 'Ubah Role User',
-                text: `Yakin ingin mengubah role ${username} menjadi ${roleText}?`,
+                text: `Yakin ingin mengubah role ${email} menjadi ${roleText}?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#198754',

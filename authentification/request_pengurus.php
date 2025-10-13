@@ -14,7 +14,7 @@ error_log("Request pengurus script accessed - Method: " . $_SERVER['REQUEST_METH
 error_log("Session data: " . print_r($_SESSION, true));
 
 // Cek apakah user login dan memiliki role umum
-if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'umum') {
+if (!isset($_SESSION['email']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'umum') {
     error_log("User not authorized - redirecting to login");
     $_SESSION['error_message'] = "Anda harus login sebagai user umum untuk mengakses fitur ini.";
     header("Location: /authentification/login.php");
@@ -28,10 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$username = mysqli_real_escape_string($conn, $_SESSION['username']);
+$email = mysqli_real_escape_string($conn, $_SESSION['email']);
 
 // Cek apakah user sudah pernah request sebelumnya
-$check_existing = mysqli_query($conn, "SELECT request_pengurus FROM users WHERE username='$username'");
+$check_existing = mysqli_query($conn, "SELECT request_pengurus FROM users WHERE email='$email'");
 if (!$check_existing) {
     error_log("Database error when checking existing request: " . mysqli_error($conn));
     $_SESSION['error_message'] = "Error: Tidak dapat mengecek status request. " . mysqli_error($conn);
@@ -40,7 +40,7 @@ if (!$check_existing) {
 }
 
 if (mysqli_num_rows($check_existing) === 0) {
-    error_log("User not found in database: " . $username);
+    error_log("User not found in database: " . $email);
     $_SESSION['error_message'] = "Error: User tidak ditemukan dalam database.";
     header("Location: " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/index.php'));
     exit();
@@ -55,10 +55,10 @@ if ($user_data['request_pengurus'] == 1) {
 }
 
 // Update request_pengurus menjadi 1
-$update_query = mysqli_query($conn, "UPDATE users SET request_pengurus = 1 WHERE username='$username'");
+$update_query = mysqli_query($conn, "UPDATE users SET request_pengurus = 1 WHERE email='$email'");
 
 if ($update_query) {
-    error_log("Request pengurus successfully updated for user: " . $username);
+    error_log("Request pengurus successfully updated for user: " . $email);
     $_SESSION['success_message'] = "Request pengurus berhasil dikirim! Menunggu persetujuan admin.";
 } else {
     error_log("Database error when updating request: " . mysqli_error($conn));

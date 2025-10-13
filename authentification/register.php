@@ -13,36 +13,36 @@ $error = "";
 $success = false;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
     $password2 = $_POST['password2'];
     $role = 'umum'; // default role
     $request_pengurus = isset($_POST['request_pengurus']) ? 1 : 0;
 
     // Validasi
-    if (empty($username)) {
-        $error = "Username tidak boleh kosong!";
-    } elseif (strlen($username) < 3) {
-        $error = "Username minimal 3 karakter!";
-    } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-        $error = "Username hanya boleh mengandung huruf, angka, dan underscore!";
+    if (empty($email)) {
+        $error = "email tidak boleh kosong!";
+    } elseif (strlen($email) < 3) {
+        $error = "email minimal 3 karakter!";
+    } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $email)) {
+        $error = "email hanya boleh mengandung huruf, angka, dan underscore!";
     } elseif ($password !== $password2) {
         $error = "Konfirmasi password tidak sama!";
     } elseif (strlen($password) < 6) {
         $error = "Password minimal 6 karakter!";
     } else {
-        // Cek username sudah terdaftar dengan prepared statement
-        $cek_stmt = mysqli_prepare($conn, "SELECT username FROM users WHERE username = ?");
-        mysqli_stmt_bind_param($cek_stmt, "s", $username);
+        // Cek email sudah terdaftar dengan prepared statement
+        $cek_stmt = mysqli_prepare($conn, "SELECT email FROM users WHERE email = ?");
+        mysqli_stmt_bind_param($cek_stmt, "s", $email);
         mysqli_stmt_execute($cek_stmt);
         $cek_result = mysqli_stmt_get_result($cek_stmt);
         
         if (mysqli_num_rows($cek_result) > 0) {
-            $error = "Username sudah terdaftar!";
+            $error = "email sudah terdaftar!";
         } else {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = mysqli_prepare($conn, "INSERT INTO users (username, password, role, request_pengurus) VALUES (?, ?, ?, ?)");
-            mysqli_stmt_bind_param($stmt, "sssi", $username, $hash, $role, $request_pengurus);
+            $stmt = mysqli_prepare($conn, "INSERT INTO users (email, password, role, request_pengurus) VALUES (?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "sssi", $email, $hash, $role, $request_pengurus);
             
             if (mysqli_stmt_execute($stmt)) {
                 $success = true;
@@ -78,9 +78,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="card-body">
                         <form method="POST" action="">
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="inputUsername" name="username" type="text" placeholder="Username" required minlength="3" maxlength="50" value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>" />
-                                <label for="inputUsername">Username</label>
-                                <div class="form-text">Username hanya boleh mengandung huruf, angka, dan underscore (_)</div>
+                                <input class="form-control" id="inputemail" name="email" type="text" placeholder="email" required minlength="3" maxlength="50" value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>" />
+                                <label for="inputemail">email</label>
+                                <div class="form-text">email hanya boleh mengandung huruf, angka, dan underscore (_)</div>
                             </div>
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Password" required minlength="6" />
@@ -123,12 +123,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             pass2.type = type;
         });
 
-        // Validasi username realtime
-        document.getElementById('inputUsername').addEventListener('input', function () {
-            const username = this.value;
+        // Validasi email realtime
+        document.getElementById('inputemail').addEventListener('input', function () {
+            const email = this.value;
             const pattern = /^[a-zA-Z0-9_]+$/;
             
-            if (username.length > 0 && !pattern.test(username)) {
+            if (email.length > 0 && !pattern.test(email)) {
                 this.classList.add('is-invalid');
             } else {
                 this.classList.remove('is-invalid');
