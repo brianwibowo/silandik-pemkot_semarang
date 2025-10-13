@@ -368,9 +368,10 @@ function renderRequestPengurusButton($hasPendingRequest)
         </div>';
     }
 
+    // MODIFIED: Menggunakan class baru 'nav-action-button' agar ukurannya lebih pas
     return '
     <form action="/authentification/request_pengurus.php" method="POST" class="d-inline-block">
-        <button type="submit" class="nav-link-fancy fancy-button fancy-button-success">
+        <button type="submit" class="nav-action-button">
             <i class="fas fa-user-plus me-1"></i>
             <span class="d-none d-sm-inline">Request Pengurus</span>
         </button>
@@ -916,4 +917,35 @@ function renderGuestUser()
             display: none !important;
         }
     }
+    
+    /* ==========================================
+   NAV ACTION BUTTON (Untuk Request Pengurus)
+   ========================================== */
+.nav-action-button {
+    margin-top: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.4rem; /* Padding lebih kecil */
+    font-size: 0.8rem;     /* Font lebih kecil */
+    font-weight: 500;
+    border-radius: 50rem;
+    text-decoration: none;
+    border: 1px solid rgba(28, 200, 138, 0.3); /* Border hijau transparan */
+    background-color: rgba(28, 200, 138, 0.1); /* Latar belakang hijau sangat soft */
+    color: #157347; /* Teks hijau gelap */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-action-button:hover {
+    background-color: #1cc88a; /* Latar belakang solid saat di-hover */
+    color: #fff;
+
+    box-shadow: 0 2px 8px rgba(28, 200, 138, 0.3);
+}
+    
+    
+    
+    
 </style>

@@ -30,7 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 
                 // Set session data
                 $_SESSION['email'] = $user['email'];
-                $_SESSION['username'] = $user['username']; // PENTING: Ditambahkan untuk navbar
+                // DIHAPUS: Baris ini tidak lagi diperlukan karena tidak ada kolom username
+                // $_SESSION['username'] = $user['username']; 
                 $_SESSION['role'] = $user['role'];
 
                 if ($user['role'] === 'pengurus' && isset($user['sekolah_id'])) {
